@@ -1,703 +1,296 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Young Sporting Club</title>
-    
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- AOS Animation Library -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    
-    <style>
-        /* ===== RESET & VARIABLES ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Login — Young Sporting Club</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#010101;--card:#111;--card2:#161616;--pink:#FE2C55;--cyan:#25F4EE;--wh:#fff;--gr:#888;--lt:#ccc;--bp:rgba(254,44,85,.25);--bc:rgba(37,244,238,.22);--gp:0 0 22px rgba(254,44,85,.5);--gdual:-5px 0 22px rgba(254,44,85,.3),5px 0 22px rgba(37,244,238,.3);--r:14px;--tr:all .3s cubic-bezier(.4,0,.2,1);--danger:#FF4757}
+[data-lang="bn"]{font-family:'Hind Siliguri',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--wh);min-height:100vh;overflow-x:hidden;display:flex;flex-direction:column}
+h1,h2,h3{font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;line-height:1.1}
+[data-lang="bn"] h1,[data-lang="bn"] h2,[data-lang="bn"] h3{font-family:'Hind Siliguri',sans-serif;letter-spacing:0}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:linear-gradient(var(--pink),var(--cyan));border-radius:3px}
 
-        :root {
-            --primary-color: #1e3c72;
-            --secondary-color: #2a5298;
-            --accent-color: #ff6b35;
-            --text-light: #ffffff;
-            --text-dark: #333333;
-            --bg-light: #f4f4f4;
-            --success: #28a745;
-            --danger: #dc3545;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
+/* LANG SWITCHER */
+.lang-sw{display:flex;align-items:center;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:3px}
+.lb{padding:5px 13px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:var(--tr);background:none;border:none;color:var(--gr)}
+.lb.on{background:linear-gradient(135deg,var(--pink),var(--cyan));color:#010101}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--text-dark);
-            overflow-x: hidden;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+/* TOP NAV BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(1,1,1,.6);backdrop-filter:blur(18px);position:fixed;top:0;left:0;right:0;z-index:100}
+.logo{display:flex;align-items:center;gap:11px}
+.li{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--pink),var(--cyan));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#010101;box-shadow:var(--gdual)}
+.lt{display:flex;flex-direction:column;line-height:1}
+.lt .n1{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;background:linear-gradient(90deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.lt .n2{font-size:9px;color:var(--gr);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
+.topbar-r{display:flex;align-items:center;gap:12px}
+.back-btn{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--gr);transition:var(--tr);padding:7px 14px;border-radius:50px;border:1px solid rgba(255,255,255,.1)}
+.back-btn:hover{color:var(--cyan);border-color:var(--bc)}
 
-        /* ===== HEADER & NAVIGATION ===== */
-        header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: var(--text-light);
-            padding: 1rem 5%;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: var(--shadow);
-        }
+/* BG */
+.login-bg{position:fixed;inset:0;background:radial-gradient(ellipse 70% 55% at 70% 45%,rgba(254,44,85,.09),transparent 65%),radial-gradient(ellipse 50% 45% at 20% 65%,rgba(37,244,238,.06),transparent 60%),var(--bg);z-index:0}
+.login-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(254,44,85,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(37,244,238,.035) 1px,transparent 1px);background-size:55px 55px;z-index:0}
+/* Floating sport emojis */
+.sport-bg{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.sb{position:absolute;opacity:.04;animation:flo linear infinite}
+@keyframes flo{0%{bottom:-60px;transform:rotate(0deg)}100%{bottom:108%;transform:rotate(360deg)}}
+.sb:nth-child(1){left:5%;font-size:30px;animation-duration:14s}
+.sb:nth-child(2){left:20%;font-size:42px;animation-duration:18s;animation-delay:3s}
+.sb:nth-child(3){left:40%;font-size:28px;animation-duration:12s;animation-delay:1s}
+.sb:nth-child(4){left:60%;font-size:44px;animation-duration:16s;animation-delay:5s}
+.sb:nth-child(5){left:78%;font-size:34px;animation-duration:20s;animation-delay:2s}
+.sb:nth-child(6){left:90%;font-size:38px;animation-duration:13s;animation-delay:7s}
 
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+/* MAIN WRAPPER */
+.login-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:100px 22px 40px;position:relative;z-index:2}
+.login-box{width:100%;max-width:440px}
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+/* CARD */
+.lcard{background:rgba(17,17,17,.95);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;box-shadow:0 8px 48px rgba(0,0,0,.5),0 0 0 1px rgba(254,44,85,.1);backdrop-filter:blur(20px)}
+/* TAB HEADER */
+.ltabs{display:flex;background:rgba(0,0,0,.4)}
+.ltab{flex:1;padding:16px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;transition:var(--tr);color:var(--gr);letter-spacing:.3px;border-bottom:3px solid transparent}
+.ltab.on{color:var(--wh);border-bottom-color:var(--pink)}
+.ltab:hover:not(.on){color:var(--lt)}
 
-        .logo img {
-            height: 50px;
-            width: auto;
-            background: white;
-            border-radius: 50%;
-            padding: 5px;
-        }
+/* FORM AREA */
+.lpanel{padding:32px 32px 28px;display:none}
+.lpanel.on{display:block}
 
-        .logo h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
+/* LOGO CENTER */
+.lcenter{text-align:center;margin-bottom:26px}
+.lbadge{width:62px;height:62px;border-radius:16px;background:linear-gradient(135deg,var(--pink),var(--cyan));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#010101;margin:0 auto 14px;box-shadow:var(--gdual)}
+.lcenter h2{font-size:26px;margin-bottom:4px}
+.lcenter p{font-size:12.5px;color:var(--gr)}
 
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
+/* FIELD */
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gr);margin-bottom:7px}
+.finput{position:relative}
+.finput input{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);color:var(--wh);padding:12px 16px 12px 44px;border-radius:var(--r);font-size:13.5px;font-family:'Poppins',sans-serif;transition:var(--tr);outline:none}
+[data-lang="bn"] .finput input{font-family:'Hind Siliguri',sans-serif}
+.finput input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(254,44,85,.12)}
+.finput input::placeholder{color:rgba(136,136,136,.5)}
+.finput .fic{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--gr);font-size:15px}
+.finput .pshow{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--gr);font-size:15px;cursor:pointer;transition:var(--tr)}
+.finput .pshow:hover{color:var(--cyan)}
 
-        .nav-menu a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-        }
+/* MSG */
+.msg{padding:11px 14px;border-radius:var(--r);font-size:12.5px;font-weight:500;margin-bottom:14px;display:none;align-items:center;gap:8px}
+.msg.show{display:flex;animation:fadein .3s}
+@keyframes fadein{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.msg-ok{background:rgba(37,244,238,.08);border:1px solid var(--bc);color:var(--cyan)}
+.msg-err{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.3);color:var(--danger)}
 
-        .nav-menu a:hover,
-        .nav-menu a.active {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
+/* SUBMIT BTN */
+.lbtn{width:100%;padding:13px;border-radius:50px;background:linear-gradient(135deg,var(--pink),#b0001a);color:#fff;font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:var(--tr);text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
+.lbtn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(254,44,85,.55)}
+.lbtn:disabled{opacity:.6;transform:none;cursor:not-allowed}
 
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-        }
+/* GOOGLE BTN */
+.gbtn{width:100%;padding:12px;border-radius:50px;background:rgba(255,255,255,.06);color:var(--wh);font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;border:1px solid rgba(255,255,255,.14);cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px}
+.gbtn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);transform:translateY(-1px)}
+.gdot{width:18px;height:18px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23FFC107' d='M43.6 20H24v8h11.3C33.6 33 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c2.9 0 5.6 1.1 7.7 2.9l5.7-5.7C33.9 6.7 29.2 5 24 5 12.9 5 4 13.9 4 25s8.9 20 20 20c11.4 0 20-8.2 20-20 0-1.3-.1-2.7-.4-4z'/%3E%3Cpath fill='%23FF3D00' d='M6.3 14.7l6.6 4.8C14.5 15 18.9 12 24 12c2.9 0 5.6 1.1 7.7 2.9l5.7-5.7C33.9 6.7 29.2 5 24 5c-7.6 0-14.2 3.9-17.7 9.7z'/%3E%3Cpath fill='%234CAF50' d='M24 45c5.2 0 9.9-1.8 13.5-4.7l-6.2-5.2C29.3 36.9 26.8 38 24 38c-5.3 0-9.6-3-11.3-7.5l-6.6 5.1C9.8 41.1 16.4 45 24 45z'/%3E%3Cpath fill='%231976D2' d='M43.6 20H24v8h11.3c-.9 2.6-2.7 4.7-5 6l6.2 5.2C40.7 35.4 44 30.6 44 25c0-1.3-.1-2.7-.4-5z'/%3E%3C/svg%3E") center/contain no-repeat;display:inline-block}
 
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background-color: var(--text-light);
-            margin: 2px 0;
-            transition: var(--transition);
-        }
+/* FORGOT */
+.forgot{text-align:right;margin-bottom:14px}
+.forgot a{font-size:12px;color:var(--cyan);transition:var(--tr)}
+.forgot a:hover{color:var(--pink)}
 
-        /* ===== PAGE HEADER ===== */
-        .page-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 4rem 5%;
-            text-align: center;
-        }
+/* DIVIDER */
+.or{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--gr);font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.or::before,.or::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08)}
 
-        .page-header h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
+/* FOOTER NOTE */
+.lnote{text-align:center;font-size:12px;color:var(--gr);margin-top:18px;padding:0 4px}
+.lnote a{color:var(--pink)}
 
-        .page-header p {
-            font-size: 1.2rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
+/* LOADER */
+.ldr{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s,visibility .5s;flex-direction:column;gap:16px}
+.ldr.hid{opacity:0;visibility:hidden;pointer-events:none}
+.lring{width:50px;height:50px;border:3px solid rgba(254,44,85,.2);border-top-color:var(--pink);border-right-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ltxt{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;background:linear-gradient(90deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
-        /* ===== LOGIN SECTION ===== */
-        .login-section {
-            padding: 3rem 5%;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .form-container {
-            max-width: 450px;
-            width: 100%;
-            margin: 0 auto;
-            background: var(--text-light);
-            padding: 3rem;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--primary-color);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid var(--bg-light);
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--primary-color);
-            color: var(--text-light);
-            border: none;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .submit-btn:hover {
-            background: var(--secondary-color);
-            transform: translateY(-2px);
-        }
-
-        .auth-buttons {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .auth-btn {
-            flex: 1;
-            padding: 1rem;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            min-width: 200px;
-        }
-
-        .auth-btn.google {
-            background: #db4437;
-            color: var(--text-light);
-        }
-
-        .auth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        .divider {
-            text-align: center;
-            margin: 2rem 0;
-            position: relative;
-        }
-
-        .divider hr {
-            border: none;
-            border-top: 1px solid var(--bg-light);
-        }
-
-        .divider span {
-            position: relative;
-            top: -12px;
-            background: white;
-            padding: 0 1rem;
-            color: var(--text-dark);
-        }
-
-        /* ===== FOOTER ===== */
-        footer {
-            background: var(--primary-color);
-            color: var(--text-light);
-            padding: 3rem 5% 1rem;
-            margin-top: auto;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .footer-section h3 {
-            margin-bottom: 1rem;
-            position: relative;
-            padding-bottom: 0.5rem;
-        }
-
-        .footer-section h3::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 50px;
-            height: 2px;
-            background: var(--accent-color);
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-section a {
-            color: var(--text-light);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer-section a:hover {
-            color: var(--accent-color);
-            padding-left: 5px;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* ===== ALERTS ===== */
-        .alert {
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-            animation: slideIn 0.3s ease;
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            z-index: 9999;
-            max-width: 400px;
-        }
-
-        .alert.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* ===== SOCIAL LINKS ===== */
-        .social-links {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            margin: 2rem 0;
-        }
-
-        .social-link {
-            width: 50px;
-            height: 50px;
-            background: var(--primary-color);
-            color: var(--text-light);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            font-size: 1.5rem;
-            transition: var(--transition);
-        }
-
-        .social-link:hover {
-            transform: translateY(-5px) rotate(360deg);
-            background: var(--accent-color);
-        }
-
-        /* ===== RESPONSIVE DESIGN ===== */
-        @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-
-            .nav-menu {
-                position: fixed;
-                left: -100%;
-                top: 80px;
-                flex-direction: column;
-                background: var(--primary-color);
-                width: 100%;
-                text-align: center;
-                transition: var(--transition);
-                padding: 2rem;
-                box-shadow: var(--shadow);
-            }
-
-            .nav-menu.active {
-                left: 0;
-            }
-
-            .page-header h1 {
-                font-size: 2.5rem;
-            }
-
-            .form-container {
-                padding: 1.5rem;
-            }
-        }
-    </style>
+@media(max-width:480px){.lpanel{padding:24px 20px 20px}.topbar{padding:10px 14px}}
+</style>
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23ff6b35'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E⚽%3C/text%3E%3C/svg%3E" alt="Young Sporting Club Logo">
-                <h1>Young Sporting Club</h1>
-            </div>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="members.html">Members</a></li>
-                <li><a href="add-member.html" id="addMemberLink" style="display:none;">Add Member</a></li>
-                <li><a href="login.html" class="active" id="loginLink">Login</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
 
-    <main>
-        <section class="page-header">
-            <h1 data-aos="fade-down">Welcome Back!</h1>
-            <p data-aos="fade-up">Login to access member management features</p>
-        </section>
+<div class="ldr" id="ldr"><div class="lring"></div><div class="ltxt">YSC</div></div>
 
-        <section class="login-section">
-            <!-- Login Form -->
-            <div class="form-container" id="loginForm" data-aos="fade-up">
-                <form id="emailLoginForm">
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" required placeholder="Enter your email">
-                    </div>
+<div class="login-bg"></div>
+<div class="login-grid"></div>
+<div class="sport-bg">
+  <span class="sb">⚽</span><span class="sb">🏏</span><span class="sb">🏸</span>
+  <span class="sb">🏆</span><span class="sb">🎽</span><span class="sb">🏅</span>
+</div>
 
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required placeholder="Enter your password">
-                    </div>
+<!-- TOP NAV -->
+<div class="topbar">
+  <a href="index.html" class="logo">
+    <div class="li">YSC</div>
+    <div class="lt"><span class="n1">YOUNG SPORTING</span><span class="n2" data-en="Est. 13 Jan 2009" data-bn="প্রতিষ্ঠা: ১৩ জানু ২০০৯">Est. 13 Jan 2009</span></div>
+  </a>
+  <div class="topbar-r">
+    <div class="lang-sw"><button class="lb on" onclick="setLang('en')">EN</button><button class="lb" onclick="setLang('bn')">বাং</button></div>
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> <span data-en="Back to Home" data-bn="হোমে ফিরুন">Back to Home</span></a>
+  </div>
+</div>
 
-                    <button type="submit" class="submit-btn">Login with Email</button>
-                </form>
+<!-- LOGIN BOX -->
+<div class="login-wrap">
+  <div class="login-box">
+    <div class="lcard">
+      <!-- TABS -->
+      <div class="ltabs">
+        <div class="ltab on" id="tabLogin" onclick="switchTab('login')" data-en="Sign In" data-bn="সাইন ইন">Sign In</div>
+        <div class="ltab" id="tabReg" onclick="switchTab('register')" data-en="Register" data-bn="নিবন্ধন">Register</div>
+      </div>
 
-                <div class="divider">
-                    <hr>
-                    <span>OR</span>
-                </div>
-
-                <div class="auth-buttons" style="justify-content: center;">
-                    <button class="auth-btn google" onclick="handleGoogleLogin()">
-                        <i class="fab fa-google"></i>
-                        Login with Google
-                    </button>
-                </div>
-
-                <div style="text-align: center; margin-top: 2rem;">
-                    <p>Don't have an account? <a href="#" onclick="showRegister()" style="color: var(--accent-color);">Register here</a></p>
-                    <p style="margin-top: 0.5rem;"><a href="#" onclick="forgotPassword()" style="color: var(--primary-color);">Forgot Password?</a></p>
-                </div>
-            </div>
-
-            <!-- Register Form (Hidden by default) -->
-            <div class="form-container" id="registerForm" style="display: none;" data-aos="fade-up">
-                <h2 style="text-align: center; margin-bottom: 2rem;">Create Account</h2>
-                <form id="emailRegisterForm">
-                    <div class="form-group">
-                        <label for="regEmail">Email Address</label>
-                        <input type="email" id="regEmail" required placeholder="Enter your email">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="regPassword">Password</label>
-                        <input type="password" id="regPassword" required placeholder="Choose a password (min. 6 characters)">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" required placeholder="Confirm your password">
-                    </div>
-
-                    <button type="submit" class="submit-btn">Register</button>
-                </form>
-                <div style="text-align: center; margin-top: 1rem;">
-                    <a href="#" onclick="showLogin()">Back to Login</a>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>Young Sporting Club</h3>
-                <p>Empowering youth through sports since 1995</p>
-                <div class="social-links" style="justify-content: flex-start;">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="members.html">Members</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Contact Info</h3>
-                <ul>
-                    <li><i class="fas fa-phone"></i> +1 234 567 890</li>
-                    <li><i class="fas fa-envelope"></i> info@youngsportingclub.com</li>
-                    <li><i class="fas fa-map-marker-alt"></i> 123 Sports Avenue, City</li>
-                </ul>
-            </div>
+      <!-- LOGIN PANEL -->
+      <div class="lpanel on" id="panelLogin">
+        <div class="lcenter">
+          <div class="lbadge">YSC</div>
+          <h2 data-en="Welcome Back!" data-bn="স্বাগতম!">Welcome Back!</h2>
+          <p data-en="Sign in to manage Young Sporting Club" data-bn="ইয়াং স্পোর্টিং ক্লাব পরিচালনায় সাইন ইন করুন">Sign in to manage Young Sporting Club</p>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 Young Sporting Club. All rights reserved.</p>
+        <div class="msg msg-ok" id="lok-msg"></div>
+        <div class="msg msg-err" id="lerr-msg"></div>
+        <div class="fg">
+          <label data-en="Email Address" data-bn="ইমেইল ঠিকানা">Email Address</label>
+          <div class="finput"><i class="fic fas fa-envelope"></i><input type="email" id="lemail" data-placeholder-en="your@email.com" data-placeholder-bn="আপনার@ইমেইল.কম" placeholder="your@email.com"/></div>
         </div>
-    </footer>
+        <div class="fg">
+          <label data-en="Password" data-bn="পাসওয়ার্ড">Password</label>
+          <div class="finput"><i class="fic fas fa-lock"></i><input type="password" id="lpass" data-placeholder-en="Enter your password" data-placeholder-bn="পাসওয়ার্ড লিখুন" placeholder="Enter your password"/><i class="pshow fas fa-eye" onclick="togglePw('lpass',this)"></i></div>
+        </div>
+        <div class="forgot"><a href="#" onclick="forgotPw(event)" data-en="Forgot password?" data-bn="পাসওয়ার্ড ভুলে গেছেন?">Forgot password?</a></div>
+        <button class="lbtn" id="loginBtn" onclick="doLogin()"><span data-en="Sign In" data-bn="সাইন ইন">Sign In</span></button>
+        <div class="or"><span data-en="or continue with" data-bn="অথবা চালিয়ে যান">or continue with</span></div>
+        <button class="gbtn" onclick="doGoogle()"><span class="gdot"></span><span data-en="Continue with Google" data-bn="গুগল দিয়ে চালিয়ে যান">Continue with Google</span></button>
+        <div class="lnote"><span data-en="Don't have an account?" data-bn="অ্যাকাউন্ট নেই?">Don't have an account?</span> <a href="#" onclick="switchTab('register')" data-en="Register here" data-bn="এখানে নিবন্ধন করুন">Register here</a></div>
+      </div>
 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    
-    <script>
-        // ==================== FIREBASE CONFIGURATION ====================
-       const firebaseConfig = {
-  apiKey: "AIzaSyD5QAGS-36neDTskPpEQjY835seWFCEq9o",
-  authDomain: "youngsportingclub.firebaseapp.com",
-  projectId: "youngsportingclub",
-  storageBucket: "youngsportingclub.firebasestorage.app",
-  messagingSenderId: "724732761340",
-  appId: "1:724732761340:web:dc664c10d55d5bb87cb379",
-  measurementId: "G-8VBTXPWVJE"
+      <!-- REGISTER PANEL -->
+      <div class="lpanel" id="panelReg">
+        <div class="lcenter">
+          <div class="lbadge" style="background:linear-gradient(135deg,var(--cyan),#00adaa)">YSC</div>
+          <h2 data-en="Join the Club!" data-bn="ক্লাবে যোগ দিন!">Join the Club!</h2>
+          <p data-en="Create your admin account" data-bn="আপনার অ্যাডমিন অ্যাকাউন্ট তৈরি করুন">Create your admin account</p>
+        </div>
+        <div class="msg msg-ok" id="rok-msg"></div>
+        <div class="msg msg-err" id="rerr-msg"></div>
+        <div class="fg">
+          <label data-en="Full Name" data-bn="পুরো নাম">Full Name</label>
+          <div class="finput"><i class="fic fas fa-user"></i><input type="text" id="rname" data-placeholder-en="Your full name" data-placeholder-bn="আপনার পুরো নাম" placeholder="Your full name"/></div>
+        </div>
+        <div class="fg">
+          <label data-en="Email Address" data-bn="ইমেইল ঠিকানা">Email Address</label>
+          <div class="finput"><i class="fic fas fa-envelope"></i><input type="email" id="remail" data-placeholder-en="your@email.com" data-placeholder-bn="আপনার@ইমেইল.কম" placeholder="your@email.com"/></div>
+        </div>
+        <div class="fg">
+          <label data-en="Password" data-bn="পাসওয়ার্ড">Password</label>
+          <div class="finput"><i class="fic fas fa-lock"></i><input type="password" id="rpass" data-placeholder-en="Min 6 characters" data-placeholder-bn="সর্বনিম্ন ৬ অক্ষর" placeholder="Min 6 characters"/><i class="pshow fas fa-eye" onclick="togglePw('rpass',this)"></i></div>
+        </div>
+        <button class="lbtn" id="regBtn" style="background:linear-gradient(135deg,var(--cyan),#00adaa);color:#010101" onclick="doRegister()"><span data-en="Create Account" data-bn="অ্যাকাউন্ট তৈরি করুন">Create Account</span></button>
+        <div class="or"><span data-en="or" data-bn="অথবা">or</span></div>
+        <button class="gbtn" onclick="doGoogle()"><span class="gdot"></span><span data-en="Continue with Google" data-bn="গুগল দিয়ে চালিয়ে যান">Continue with Google</span></button>
+        <div class="lnote"><span data-en="Already have an account?" data-bn="ইতিমধ্যে অ্যাকাউন্ট আছে?">Already have an account?</span> <a href="#" onclick="switchTab('login')" data-en="Sign in here" data-bn="এখানে সাইন ইন করুন">Sign in here</a></div>
+      </div>
+    </div>
+
+    <!-- FOOTER NOTE -->
+    <p style="text-align:center;color:var(--gr);font-size:11.5px;margin-top:18px">
+      <span data-en="Young Sporting Club · Est. 13 January 2009" data-bn="ইয়াং স্পোর্টিং ক্লাব · প্রতিষ্ঠা: ১৩ জানুয়ারি ২০০৯">Young Sporting Club · Est. 13 January 2009</span><br>
+      <span style="font-size:10.5px" data-en="Shingrahully, Shamsher Nagar, Moulvibazar" data-bn="শিংড়াউলী, শমশেরনগর, মৌলভীবাজার">Shingrahully, Shamsher Nagar, Moulvibazar</span>
+    </p>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+const FC={apiKey:"AIzaSyD5QAGS-36neDTskPpEQjY835seWFCEq9o",authDomain:"youngsportingclub.firebaseapp.com",databaseURL:"https://youngsportingclub-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"youngsportingclub",storageBucket:"youngsportingclub.firebasestorage.app",messagingSenderId:"724732761340",appId:"1:724732761340:web:dc664c10d55d5bb87cb379"};
+const app=initializeApp(FC),auth=getAuth(app),provider=new GoogleAuthProvider();
+
+window.addEventListener('load',()=>setTimeout(()=>document.getElementById('ldr').classList.add('hid'),500));
+
+onAuthStateChanged(auth,user=>{if(user)setTimeout(()=>location.href='index.html',500);});
+
+function lg(){return document.documentElement.getAttribute('data-lang')||'en';}
+function showMsg(id,txt,type){const el=document.getElementById(id);el.textContent=txt;el.className='msg msg-'+type+' show';}
+function hideMsg(id){const el=document.getElementById(id);el.className='msg';el.textContent='';}
+function errMsg(code,lang){
+  const map={'auth/user-not-found':{en:'No account found with this email.',bn:'এই ইমেইলে কোনো অ্যাকাউন্ট নেই।'},'auth/wrong-password':{en:'Wrong password. Please try again.',bn:'ভুল পাসওয়ার্ড। আবার চেষ্টা করুন।'},'auth/email-already-in-use':{en:'This email is already registered.',bn:'এই ইমেইলটি ইতিমধ্যে নিবন্ধিত।'},'auth/weak-password':{en:'Password must be at least 6 characters.',bn:'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে।'},'auth/invalid-email':{en:'Invalid email address.',bn:'অবৈধ ইমেইল ঠিকানা।'},'auth/too-many-requests':{en:'Too many attempts. Try later.',bn:'অনেক বার চেষ্টা করা হয়েছে। পরে চেষ্টা করুন।'},'auth/popup-closed-by-user':{en:'Sign-in popup was closed.',bn:'সাইন-ইন পপআপ বন্ধ হয়ে গেছে।'}};
+  const m=map[code];return m?(lang==='bn'?m.bn:m.en):(lang==='bn'?'⚠ কিছু সমস্যা হয়েছে।':'⚠ Something went wrong.');
+}
+window.switchTab=function(t){
+  document.getElementById('panelLogin').className='lpanel'+(t==='login'?' on':'');
+  document.getElementById('panelReg').className='lpanel'+(t==='register'?' on':'');
+  document.getElementById('tabLogin').className='ltab'+(t==='login'?' on':'');
+  document.getElementById('tabReg').className='ltab'+(t==='register'?' on':'');
 };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-
-        // ==================== AUTHENTICATION STATE ====================
-        auth.onAuthStateChanged((user) => {
-            const loginLink = document.getElementById('loginLink');
-            const addMemberLink = document.getElementById('addMemberLink');
-            
-            if (user) {
-                // If already logged in, redirect to home
-                window.location.href = 'index.html';
-            }
-        });
-
-        // ==================== LOGIN FUNCTIONS ====================
-        function handleEmailLogin(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            auth.signInWithEmailAndPassword(email, password)
-                .then(() => {
-                    showAlert('Login successful!');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1500);
-                })
-                .catch((error) => {
-                    let message = 'Login failed: ';
-                    switch (error.code) {
-                        case 'auth/user-not-found':
-                            message += 'User not found. Please register first.';
-                            break;
-                        case 'auth/wrong-password':
-                            message += 'Incorrect password.';
-                            break;
-                        case 'auth/invalid-email':
-                            message += 'Invalid email address.';
-                            break;
-                        default:
-                            message += error.message;
-                    }
-                    showAlert(message, 'error');
-                });
-        }
-
-        function handleGoogleLogin() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            
-            auth.signInWithPopup(provider)
-                .then(() => {
-                    showAlert('Login successful with Google!');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1500);
-                })
-                .catch((error) => {
-                    showAlert('Google login failed: ' + error.message, 'error');
-                });
-        }
-
-        function handleRegister(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (password.length < 6) {
-                showAlert('Password must be at least 6 characters', 'error');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                showAlert('Passwords do not match', 'error');
-                return;
-            }
-
-            auth.createUserWithEmailAndPassword(email, password)
-                .then(() => {
-                    showAlert('Registration successful!');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1500);
-                })
-                .catch((error) => {
-                    let message = 'Registration failed: ';
-                    if (error.code === 'auth/email-already-in-use') {
-                        message += 'Email already in use. Please login.';
-                    } else {
-                        message += error.message;
-                    }
-                    showAlert(message, 'error');
-                });
-        }
-
-        function forgotPassword() {
-            const email = prompt('Please enter your email address:');
-            if (email) {
-                auth.sendPasswordResetEmail(email)
-                    .then(() => {
-                        showAlert('Password reset email sent! Check your inbox.');
-                    })
-                    .catch((error) => {
-                        showAlert('Error: ' + error.message, 'error');
-                    });
-            }
-        }
-
-        // ==================== UI FUNCTIONS ====================
-        function showRegister() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-        }
-
-        function showLogin() {
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        }
-
-        function showAlert(message, type = 'success') {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert ${type}`;
-            alertDiv.textContent = message;
-            
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 5000);
-        }
-
-        // ==================== INITIALIZATION ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize AOS
-            AOS.init({
-                duration: 1000,
-                once: true,
-                offset: 100
-            });
-
-            // Add form submit handlers
-            document.getElementById('emailLoginForm').addEventListener('submit', handleEmailLogin);
-            document.getElementById('emailRegisterForm').addEventListener('submit', handleRegister);
-
-            // Mobile menu toggle
-            const hamburger = document.querySelector('.hamburger');
-            const navMenu = document.querySelector('.nav-menu');
-
-            hamburger.addEventListener('click', () => {
-                navMenu.classList.toggle('active');
-            });
-        });
-    </script>
+window.togglePw=function(id,icon){const el=document.getElementById(id);if(el.type==='password'){el.type='text';icon.classList.replace('fa-eye','fa-eye-slash');}else{el.type='password';icon.classList.replace('fa-eye-slash','fa-eye');}};
+window.doLogin=async function(){
+  const email=document.getElementById('lemail').value.trim(),pass=document.getElementById('lpass').value;
+  if(!email||!pass){showMsg('lerr-msg',lg()==='bn'?'⚠ সকল তথ্য পূরণ করুন।':'⚠ Please fill in all fields.','err');return;}
+  hideMsg('lerr-msg');const btn=document.getElementById('loginBtn');btn.disabled=true;btn.textContent=lg()==='bn'?'সাইন ইন হচ্ছে…':'Signing in…';
+  try{await signInWithEmailAndPassword(auth,email,pass);showMsg('lok-msg',lg()==='bn'?'✓ সফলভাবে সাইন ইন হয়েছে! ড্যাশবোর্ডে যাচ্ছে…':'✓ Signed in! Redirecting…','ok');}
+  catch(e){showMsg('lerr-msg',errMsg(e.code,lg()),'err');}
+  btn.disabled=false;btn.innerHTML=`<span data-en="Sign In" data-bn="সাইন ইন">${lg()==='bn'?'সাইন ইন':'Sign In'}</span>`;
+};
+window.doRegister=async function(){
+  const name=document.getElementById('rname').value.trim(),email=document.getElementById('remail').value.trim(),pass=document.getElementById('rpass').value;
+  if(!name||!email||!pass){showMsg('rerr-msg',lg()==='bn'?'⚠ সকল তথ্য পূরণ করুন।':'⚠ Please fill in all fields.','err');return;}
+  hideMsg('rerr-msg');const btn=document.getElementById('regBtn');btn.disabled=true;btn.textContent=lg()==='bn'?'তৈরি হচ্ছে…':'Creating…';
+  try{const cred=await createUserWithEmailAndPassword(auth,email,pass);await updateProfile(cred.user,{displayName:name});showMsg('rok-msg',lg()==='bn'?'✓ অ্যাকাউন্ট তৈরি হয়েছে! ড্যাশবোর্ডে যাচ্ছে…':'✓ Account created! Redirecting…','ok');}
+  catch(e){showMsg('rerr-msg',errMsg(e.code,lg()),'err');}
+  btn.disabled=false;btn.innerHTML=`<span>${lg()==='bn'?'অ্যাকাউন্ট তৈরি করুন':'Create Account'}</span>`;
+};
+window.doGoogle=async function(){
+  try{await signInWithPopup(auth,provider);}
+  catch(e){if(e.code!=='auth/popup-closed-by-user'){showMsg('lerr-msg',errMsg(e.code,lg()),'err');}}
+};
+window.forgotPw=async function(e){
+  e.preventDefault();const email=document.getElementById('lemail').value.trim();
+  if(!email){showMsg('lerr-msg',lg()==='bn'?'⚠ প্রথমে ইমেইল লিখুন।':'⚠ Enter your email address first.','err');return;}
+  try{await sendPasswordResetEmail(auth,email);showMsg('lok-msg',lg()==='bn'?'✓ পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে।':'✓ Password reset link sent. Check your email.','ok');}
+  catch(e){showMsg('lerr-msg',errMsg(e.code,lg()),'err');}
+};
+</script>
+<script>
+let CL=(function(){try{return localStorage.getItem('ysc-lang')||'en';}catch(e){return 'en';}})();
+function setLang(lang){
+  CL=lang;try{localStorage.setItem('ysc-lang',lang);}catch(e){}
+  document.documentElement.setAttribute('data-lang',lang);
+  document.documentElement.lang=lang==='bn'?'bn':'en';
+  document.querySelectorAll('[data-en]').forEach(el=>{
+    const v=el.getAttribute('data-'+lang);
+    if(v===null)return;
+    if(v.includes('<'))el.innerHTML=v;else el.textContent=v;
+  });
+  document.querySelectorAll('.lb').forEach(b=>{
+    b.classList.remove('on');
+    if((lang==='en'&&b.textContent.trim()==='EN')||(lang==='bn'&&b.textContent.trim()==='বাং'))b.classList.add('on');
+  });
+  // Update placeholders
+  const phMap=[
+    ['lemail',{en:'your@email.com',bn:'আপনার@ইমেইল.কম'}],
+    ['lpass',{en:'Enter your password',bn:'পাসওয়ার্ড লিখুন'}],
+    ['rname',{en:'Your full name',bn:'আপনার পুরো নাম'}],
+    ['remail',{en:'your@email.com',bn:'আপনার@ইমেইল.কম'}],
+    ['rpass',{en:'Min 6 characters',bn:'সর্বনিম্ন ৬ অক্ষর'}],
+  ];
+  phMap.forEach(([id,p])=>{const el=document.getElementById(id);if(el)el.placeholder=p[lang]||p.en;});
+}
+document.addEventListener('DOMContentLoaded',()=>setLang(CL));
+</script>
 </body>
 </html>
