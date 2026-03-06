@@ -1,1697 +1,519 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Young Sporting Club - Home</title>
-    
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- AOS Animation Library -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
-    <!-- Lottie Player -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
-    
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    
-    <style>
-        /* ===== RESET & VARIABLES ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-color: #1e3c72;
-            --secondary-color: #2a5298;
-            --accent-color: #ff6b35;
-            --text-light: #ffffff;
-            --text-dark: #333333;
-            --bg-light: #f4f4f4;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--text-dark);
-            overflow-x: hidden;
-        }
-
-        /* ===== HEADER & NAVIGATION ===== */
-        header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: var(--text-light);
-            padding: 1rem 5%;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: var(--shadow);
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo img {
-            height: 50px;
-            width: auto;
-            background: white;
-            border-radius: 50%;
-            padding: 5px;
-        }
-
-        .logo h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-menu a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-        }
-
-        .nav-menu a:hover,
-        .nav-menu a.active {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-        }
-
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background-color: var(--text-light);
-            margin: 2px 0;
-            transition: var(--transition);
-        }
-
-        /* ===== HERO SECTION ===== */
-        .hero {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: var(--text-light);
-            padding: 4rem 5%;
-            min-height: 80vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M20 20 L80 20 L80 80 L20 80 Z" fill="none" stroke="white" stroke-width="2"/><circle cx="50" cy="50" r="20" fill="none" stroke="white" stroke-width="2"/></svg>') repeat;
-            animation: float 20s linear infinite;
-        }
-
-        @keyframes float {
-            from { transform: translateY(0) rotate(0deg); }
-            to { transform: translateY(-100px) rotate(10deg); }
-        }
-
-        .hero-content {
-            flex: 1;
-            max-width: 600px;
-            z-index: 1;
-        }
-
-        .hero-content h2 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            animation: slideInLeft 1s ease;
-        }
-
-        .hero-content p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            animation: slideInLeft 1s ease 0.2s both;
-        }
-
-        .hero-animation {
-            flex: 1;
-            height: 500px;
-            z-index: 1;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 1rem 2rem;
-            background-color: var(--accent-color);
-            color: var(--text-light);
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: var(--transition);
-            animation: slideInLeft 1s ease 0.4s both;
-            border: none;
-            cursor: pointer;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
-        }
-
-        /* ===== SECTIONS ===== */
-        section {
-            padding: 5rem 5%;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: var(--primary-color);
-            position: relative;
-        }
-
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 80px;
-            height: 4px;
-            background: var(--accent-color);
-            margin: 1rem auto;
-            border-radius: 2px;
-        }
-
-        /* ===== CARDS GRID ===== */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .card {
-            background: var(--text-light);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .card-content {
-            padding: 2rem;
-        }
-
-        .card h3 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-
-        /* ===== STATS SECTION ===== */
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            padding: 3rem;
-            border-radius: 10px;
-            color: var(--text-light);
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        /* ===== MEMBERS TABLE ===== */
-        .table-container {
-            overflow-x: auto;
-            margin-top: 2rem;
-        }
-
-        .members-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--text-light);
-            box-shadow: var(--shadow);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .members-table thead {
-            background: var(--primary-color);
-            color: var(--text-light);
-        }
-
-        .members-table th,
-        .members-table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--bg-light);
-        }
-
-        .members-table tbody tr {
-            transition: var(--transition);
-        }
-
-        .members-table tbody tr:hover {
-            background: var(--bg-light);
-        }
-
-        /* ===== FILTER SECTION ===== */
-        .filter-section {
-            background: var(--text-light);
-            padding: 2rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-section input,
-        .filter-section select {
-            flex: 1;
-            min-width: 250px;
-            padding: 0.8rem;
-            border: 2px solid var(--bg-light);
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .filter-section input:focus,
-        .filter-section select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        /* ===== FORMS ===== */
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: var(--text-light);
-            padding: 3rem;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--primary-color);
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid var(--bg-light);
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--primary-color);
-            color: var(--text-light);
-            border: none;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .submit-btn:hover {
-            background: var(--secondary-color);
-            transform: translateY(-2px);
-        }
-
-        /* ===== AUTH BUTTONS ===== */
-        .auth-buttons {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .auth-btn {
-            flex: 1;
-            padding: 1rem;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .auth-btn.email {
-            background: var(--primary-color);
-            color: var(--text-light);
-        }
-
-        .auth-btn.google {
-            background: #db4437;
-            color: var(--text-light);
-        }
-
-        .auth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        /* ===== ALERTS ===== */
-        .alert {
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-            animation: slideIn 0.3s ease;
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            z-index: 9999;
-            max-width: 400px;
-        }
-
-        .alert.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* ===== SOCIAL LINKS ===== */
-        .social-links {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            margin: 2rem 0;
-        }
-
-        .social-link {
-            width: 50px;
-            height: 50px;
-            background: var(--primary-color);
-            color: var(--text-light);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            font-size: 1.5rem;
-            transition: var(--transition);
-        }
-
-        .social-link:hover {
-            transform: translateY(-5px) rotate(360deg);
-            background: var(--accent-color);
-        }
-
-        /* ===== FOOTER ===== */
-        footer {
-            background: var(--primary-color);
-            color: var(--text-light);
-            padding: 3rem 5% 1rem;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .footer-section h3 {
-            margin-bottom: 1rem;
-            position: relative;
-            padding-bottom: 0.5rem;
-        }
-
-        .footer-section h3::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 50px;
-            height: 2px;
-            background: var(--accent-color);
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-section a {
-            color: var(--text-light);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer-section a:hover {
-            color: var(--accent-color);
-            padding-left: 5px;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* ===== LOTTIE ANIMATION ===== */
-        .lottie-container {
-            width: 100%;
-            height: 100%;
-            min-height: 300px;
-        }
-
-        /* ===== POSITION BADGES ===== */
-        .position-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-        .position-president {
-            background: #ffd700;
-            color: #333;
-        }
-        .position-vice-president {
-            background: #c0c0c0;
-            color: #333;
-        }
-        .position-secretary {
-            background: #cd7f32;
-            color: white;
-        }
-        .position-member {
-            background: var(--primary-color);
-            color: white;
-        }
-        .action-btn {
-            padding: 0.25rem 0.5rem;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            margin: 0 0.25rem;
-            font-size: 0.85rem;
-            transition: var(--transition);
-        }
-        .edit-btn {
-            background: var(--warning);
-            color: #333;
-        }
-        .delete-btn {
-            background: var(--danger);
-            color: white;
-        }
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        /* ===== RESPONSIVE DESIGN ===== */
-        @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-
-            .nav-menu {
-                position: fixed;
-                left: -100%;
-                top: 80px;
-                flex-direction: column;
-                background: var(--primary-color);
-                width: 100%;
-                text-align: center;
-                transition: var(--transition);
-                padding: 2rem;
-                box-shadow: var(--shadow);
-            }
-
-            .nav-menu.active {
-                left: 0;
-            }
-
-            .hero {
-                flex-direction: column;
-                text-align: center;
-                padding: 2rem 5%;
-            }
-
-            .hero-content h2 {
-                font-size: 2.5rem;
-            }
-
-            .hero-animation {
-                height: 300px;
-                margin-top: 2rem;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            .stats-container {
-                grid-template-columns: 1fr;
-            }
-
-            .filter-section {
-                flex-direction: column;
-            }
-
-            .form-container {
-                padding: 1.5rem;
-            }
-            
-            .alert {
-                left: 20px;
-                right: 20px;
-                max-width: none;
-            }
-        }
-
-        /* ===== ANIMATIONS ===== */
-        @keyframes slideInLeft {
-            from {
-                transform: translateX(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .fadeInUp {
-            animation: fadeInUp 0.6s ease;
-        }
-
-        /* ===== LOADING SPINNER ===== */
-        .loading-spinner {
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--bg-light);
-            border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Young Sporting Club — Home</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#010101;--bg2:#0a0a0a;--card:#111;--card2:#161616;--pink:#FE2C55;--cyan:#25F4EE;--wh:#fff;--gr:#888;--lt:#ccc;--bp:rgba(254,44,85,.25);--bc:rgba(37,244,238,.22);--gp:0 0 22px rgba(254,44,85,.5);--gc:0 0 22px rgba(37,244,238,.5);--gdual:-5px 0 22px rgba(254,44,85,.3),5px 0 22px rgba(37,244,238,.3);--r:14px;--tr:all .3s cubic-bezier(.4,0,.2,1)}
+[data-lang="bn"]{font-family:'Hind Siliguri',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--wh);line-height:1.6;overflow-x:hidden}
+h1,h2,h3,h4{font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;line-height:1.1}
+[data-lang="bn"] h1,[data-lang="bn"] h2,[data-lang="bn"] h3,[data-lang="bn"] h4{font-family:'Hind Siliguri',sans-serif;letter-spacing:0}
+a{text-decoration:none;color:inherit}
+ul{list-style:none}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:linear-gradient(var(--pink),var(--cyan));border-radius:3px}
+.container{max-width:1200px;margin:0 auto;padding:0 22px}
+.sp{padding:90px 0}
+.tc{text-align:center}
+/* BADGE */
+.bdg{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--bp);background:rgba(254,44,85,.08);color:var(--pink);padding:5px 16px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.bdg .dot{width:6px;height:6px;border-radius:50%;background:var(--pink);animation:blink 1.8s infinite;box-shadow:0 0 6px var(--pink)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.sec-title{font-size:clamp(34px,5vw,54px);margin-bottom:10px}
+.divider{width:52px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--pink),var(--cyan));margin:12px auto 20px}
+.sub{color:var(--gr);font-size:15px;max-width:520px;margin:0 auto 46px;line-height:1.75}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 26px;border-radius:50px;font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;text-transform:uppercase;letter-spacing:.5px;transition:var(--tr)}
+.btn-pk{background:linear-gradient(135deg,var(--pink),#b0001a);color:#fff}.btn-pk:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(254,44,85,.55)}
+.btn-cy{background:linear-gradient(135deg,var(--cyan),#00adaa);color:#010101;font-weight:800}.btn-cy:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(37,244,238,.55)}
+.btn-ol{background:transparent;color:var(--wh);border:1.5px solid rgba(255,255,255,.2)}.btn-ol:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:var(--gc)}
+/* LANG SWITCHER */
+.lang-sw{display:flex;align-items:center;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:3px}
+.lb{padding:5px 13px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:var(--tr);background:none;border:none;color:var(--gr)}
+.lb.on{background:linear-gradient(135deg,var(--pink),var(--cyan));color:#010101}
+/* HEADER */
+#hdr{position:fixed;top:0;left:0;right:0;z-index:1000;padding:5px 0;transition:var(--tr)}
+#hdr.sc{background:rgba(1,1,1,.94);backdrop-filter:blur(22px);border-bottom:1px solid var(--bp);box-shadow:0 2px 28px rgba(254,44,85,.12)}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:9px 22px;max-width:1200px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:11px}
+.li{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--pink),var(--cyan));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#010101;box-shadow:var(--gdual)}
+.lt{display:flex;flex-direction:column;line-height:1}
+.lt .n1{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;background:linear-gradient(90deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.lt .n2{font-size:9px;color:var(--gr);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
+.nl{display:flex;align-items:center;gap:3px}
+.nl a{padding:7px 12px;border-radius:8px;font-size:12.5px;font-weight:500;color:var(--gr);transition:var(--tr);position:relative}
+.nl a:hover,.nl a.on{color:#fff;background:rgba(255,255,255,.07)}
+.nl a.on::after{content:'';display:block;width:4px;height:4px;border-radius:50%;background:var(--pink);margin:1px auto 0;box-shadow:var(--gp)}
+.nr{display:flex;align-items:center;gap:10px}
+.ncta{background:linear-gradient(135deg,var(--pink),#b0001a)!important;color:#fff!important;font-weight:700!important;border-radius:50px!important;font-size:12px;padding:8px 18px}
+.hbg{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none}
+.hbg span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:var(--tr)}
+.hbg.op span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hbg.op span:nth-child(2){opacity:0}
+.hbg.op span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+.mob{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(1,1,1,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bp);padding:16px 22px;flex-direction:column;gap:3px;z-index:997}
+.mob.op{display:flex}
+.mob a{padding:11px 14px;border-radius:8px;font-size:14px;font-weight:500;color:var(--lt);transition:var(--tr)}
+.mob a:hover,.mob a.on{color:#fff;background:rgba(254,44,85,.1)}
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:74px}
+.hbg2{position:absolute;inset:0;background:radial-gradient(ellipse 75% 60% at 68% 48%,rgba(254,44,85,.08),transparent 65%),radial-gradient(ellipse 55% 45% at 18% 72%,rgba(37,244,238,.06),transparent 58%),var(--bg);z-index:0}
+.hgrid{position:absolute;inset:0;background-image:linear-gradient(rgba(254,44,85,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(37,244,238,.04) 1px,transparent 1px);background-size:55px 55px;z-index:0}
+.sportbg{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.sb2{position:absolute;opacity:.045;animation:flo linear infinite}
+@keyframes flo{0%{bottom:-60px;transform:rotate(0deg) scale(.8)}100%{bottom:108%;transform:rotate(360deg) scale(1.1)}}
+.sb2:nth-child(1){left:3%;font-size:28px;animation-duration:13s}
+.sb2:nth-child(2){left:14%;font-size:42px;animation-duration:17s;animation-delay:2.5s}
+.sb2:nth-child(3){left:27%;font-size:32px;animation-duration:11s;animation-delay:.8s}
+.sb2:nth-child(4){left:42%;font-size:44px;animation-duration:15s;animation-delay:4s}
+.sb2:nth-child(5){left:58%;font-size:30px;animation-duration:19s;animation-delay:1.5s}
+.sb2:nth-child(6){left:72%;font-size:38px;animation-duration:14s;animation-delay:6s}
+.sb2:nth-child(7){left:85%;font-size:34px;animation-duration:12s;animation-delay:3s}
+.sb2:nth-child(8){left:93%;font-size:26px;animation-duration:16s;animation-delay:5s}
+.hw{display:grid;grid-template-columns:1fr 1fr;gap:55px;align-items:center;position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:0 22px;width:100%}
+.hew{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--bc);background:rgba(37,244,238,.07);color:var(--cyan);padding:6px 16px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px}
+.hew .pd{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:pc 2s infinite;box-shadow:0 0 8px var(--cyan)}
+@keyframes pc{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.3}}
+.htitle{font-size:clamp(48px,7vw,82px);line-height:.92;margin-bottom:20px}
+.htitle .l1{display:block;color:#fff}
+.htitle .l2{display:block;background:linear-gradient(90deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+[data-lang="bn"] .htitle{font-family:'Hind Siliguri',sans-serif;font-size:clamp(36px,5.5vw,64px)}
+.hdesc{font-size:15px;color:var(--gr);line-height:1.8;margin-bottom:10px;max-width:440px}
+.hloc{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:var(--cyan);margin-bottom:28px;line-height:1.5}
+.hloc i{margin-top:3px}
+.hbtns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:42px}
+.hstats{display:flex;gap:28px}
+.hst .num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:#fff;line-height:1;display:flex;align-items:flex-start}
+.hst .num sup{font-size:20px;color:var(--pink);line-height:1.5}
+.hst .lbl{font-size:11px;color:var(--gr);text-transform:uppercase;letter-spacing:1.5px;font-weight:500}
+/* Hero Right Badge */
+.hro{display:flex;justify-content:center;align-items:center;position:relative}
+.bring{width:310px;height:310px;border-radius:50%;border:3px solid transparent;background:linear-gradient(var(--bg2),var(--bg2)) padding-box,linear-gradient(135deg,var(--pink),var(--cyan)) border-box;display:flex;align-items:center;justify-content:center;animation:spinslow 20s linear infinite;box-shadow:var(--gdual)}
+@keyframes spinslow{to{transform:rotate(360deg)}}
+.binn{position:absolute;width:265px;height:265px;border-radius:50%;background:radial-gradient(ellipse at 40% 35%,rgba(254,44,85,.15),rgba(1,1,1,.95));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;animation:spinslow 20s linear infinite reverse}
+.btr{font-size:62px;filter:drop-shadow(0 0 14px var(--pink))}
+.best{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;color:var(--cyan);text-shadow:0 0 10px var(--cyan)}
+.bsp{display:flex;gap:10px;font-size:25px}
+.bsp span{filter:drop-shadow(0 0 6px var(--pink))}
+.borb{position:absolute;width:310px;height:310px;border-radius:50%;animation:spinslow 8s linear infinite}
+.bdot{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--pink);box-shadow:var(--gp);top:-6px;left:50%;transform:translateX(-50%)}
+.hscr{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:7px;color:var(--gr);font-size:10px;letter-spacing:2px;text-transform:uppercase;z-index:2;animation:bncsc 2.2s ease-in-out infinite}
+.hscr .scrl{width:1px;height:36px;background:linear-gradient(to bottom,var(--pink),transparent)}
+@keyframes bncsc{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
+/* STATS BAND */
+.stb{background:var(--card);border-top:1px solid var(--bp);border-bottom:1px solid var(--bc);padding:26px 0;position:relative;overflow:hidden}
+.stb::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(254,44,85,.04),rgba(37,244,238,.04));pointer-events:none}
+.stbg{display:grid;grid-template-columns:repeat(4,1fr)}
+.sti{text-align:center;padding:10px 18px;border-right:1px solid rgba(255,255,255,.06)}
+.sti:last-child{border-right:none}
+.sti .sn{font-family:'Bebas Neue',sans-serif;font-size:46px;background:linear-gradient(135deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.sti .sl{font-size:11px;color:var(--gr);text-transform:uppercase;letter-spacing:1.5px;margin-top:4px}
+/* ABOUT */
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:65px;align-items:center}
+.avis{position:relative}
+.afr{width:100%;aspect-ratio:4/3;background:var(--card);border-radius:var(--r);border:1px solid var(--bp);overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+.afrbg{position:absolute;inset:0;background:radial-gradient(ellipse at 40% 35%,rgba(254,44,85,.12),transparent 60%),radial-gradient(ellipse at 70% 70%,rgba(37,244,238,.08),transparent 50%)}
+.afrwm{font-family:'Bebas Neue',sans-serif;font-size:72px;color:rgba(254,44,85,.05);letter-spacing:6px;position:relative;z-index:1}
+.abc{position:absolute;bottom:-18px;right:-18px;background:linear-gradient(135deg,var(--pink),#8b0000);color:#fff;padding:16px 20px;border-radius:var(--r);text-align:center;box-shadow:0 8px 28px rgba(254,44,85,.5)}
+.abc .yr{font-family:'Bebas Neue',sans-serif;font-size:38px;line-height:1}
+.abc .sn2{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.75)}
+.ac .sec-title,.ac .divider{text-align:left;margin-left:0}
+.atxt{color:var(--gr);font-size:14.5px;line-height:1.85;margin-bottom:14px}
+.ahi{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+.hit{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--card2);border-radius:var(--r);border:1px solid rgba(255,255,255,.06);font-size:13px;font-weight:500;transition:var(--tr);cursor:default}
+.hit:hover{border-color:var(--bp);box-shadow:0 0 18px rgba(254,44,85,.2);transform:translateY(-2px)}
+.hic{width:32px;height:32px;border-radius:8px;background:rgba(254,44,85,.12);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+/* ACHIEVEMENTS */
+.asec{background:var(--card);position:relative;overflow:hidden}
+.asec::before{content:'CHAMPIONS';position:absolute;font-family:'Bebas Neue',sans-serif;font-size:180px;color:rgba(254,44,85,.025);top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;letter-spacing:20px;pointer-events:none}
+.agr{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.ac2{background:var(--card2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:30px 24px;text-align:center;transition:var(--tr);position:relative;overflow:hidden;cursor:default}
+.ac2::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(254,44,85,.05),rgba(37,244,238,.03));opacity:0;transition:var(--tr)}
+.ac2::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pink),var(--cyan));transform:scaleX(0);transition:var(--tr)}
+.ac2:hover{transform:translateY(-7px);border-color:var(--bp);box-shadow:0 12px 40px rgba(254,44,85,.25),0 0 0 1px rgba(254,44,85,.1)}
+.ac2:hover::before,.ac2:hover::after{opacity:1;transform:scaleX(1)}
+.aic{width:62px;height:62px;border-radius:16px;background:rgba(254,44,85,.1);border:1px solid var(--bp);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 18px;transition:var(--tr)}
+.ac2:hover .aic{box-shadow:0 0 22px rgba(254,44,85,.5);background:rgba(254,44,85,.2)}
+.ac2 h3{font-size:18px;margin-bottom:8px;color:#fff}
+.ac2 p{font-size:12.5px;color:var(--gr);line-height:1.65}
+.ayr{display:inline-block;margin-top:14px;padding:4px 12px;background:rgba(37,244,238,.08);color:var(--cyan);border-radius:50px;font-size:10.5px;font-weight:700;letter-spacing:.5px;border:1px solid var(--bc)}
+/* COMMITTEE */
+.cgr{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:32px}
+.cc{background:var(--card2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:26px 18px;text-align:center;transition:var(--tr);cursor:default}
+.cc:hover{transform:translateY(-5px);border-color:var(--bp);box-shadow:0 0 28px rgba(254,44,85,.2)}
+.cav{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--cyan));margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;color:#010101;box-shadow:var(--gdual)}
+.cc h4{font-size:15px;margin-bottom:3px;color:#fff}
+.cc .role{font-size:10.5px;color:var(--pink);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+/* CTA */
+.ctasec{background:linear-gradient(135deg,rgba(254,44,85,.1),rgba(37,244,238,.07));border-top:1px solid var(--bp);border-bottom:1px solid var(--bc);text-align:center;position:relative;overflow:hidden}
+.ctasec::before{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(254,44,85,.08),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.ctasec h2{font-size:clamp(34px,5vw,58px);margin-bottom:14px}
+.ctasec p{color:var(--gr);font-size:15px;margin-bottom:34px;max-width:480px;margin-left:auto;margin-right:auto}
+.ctabtns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+/* FOOTER */
+footer{background:#050505;border-top:1px solid var(--bp);padding:58px 0 22px}
+.ftgr{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:38px;margin-bottom:44px}
+.ftdesc{color:var(--gr);font-size:13px;line-height:1.85;margin:14px 0 22px}
+.slnks{display:flex;gap:9px}
+.sa{width:38px;height:38px;border-radius:10px;background:var(--card2);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;color:var(--gr);font-size:16px;transition:var(--tr)}
+.sa:hover{transform:translateY(-2px)}
+.sa.fb:hover{background:#1877F2;border-color:#1877F2;color:#fff;box-shadow:0 0 16px rgba(24,119,242,.4)}
+.sa.yt:hover{background:#FF0000;border-color:#FF0000;color:#fff;box-shadow:0 0 16px rgba(255,0,0,.4)}
+.sa.ig:hover{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);border-color:#dc2743;color:#fff}
+.sa.em:hover{background:var(--pink);border-color:var(--pink);color:#fff;box-shadow:var(--gp)}
+.fcol h4{font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#fff;margin-bottom:18px}
+.fcol ul li{margin-bottom:9px}
+.fcol ul li a{color:var(--gr);font-size:13px;transition:var(--tr)}
+.fcol ul li a:hover{color:var(--pink);padding-left:4px}
+.ci2 li{display:flex;align-items:flex-start;gap:8px;color:var(--gr);font-size:12.5px;margin-bottom:9px}
+.ci2 .ico{color:var(--cyan);font-size:13px;margin-top:2px;flex-shrink:0}
+.ftbot{border-top:1px solid rgba(255,255,255,.06);padding-top:22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.ftbot p,.ftbot .dev{color:var(--gr);font-size:11.5px}
+.ftbot .dev span{color:var(--pink)}
+/* LOADER */
+.ldr{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s,visibility .5s;flex-direction:column;gap:16px}
+.ldr.hid{opacity:0;visibility:hidden;pointer-events:none}
+.lring{width:50px;height:50px;border:3px solid rgba(254,44,85,.2);border-top-color:var(--pink);border-right-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ltxt{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;background:linear-gradient(90deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--card2);border:1px solid var(--bp);border-radius:var(--r);padding:13px 18px;font-size:13px;font-weight:500;z-index:9998;transform:translateY(20px);opacity:0;transition:all .3s;max-width:300px;display:flex;align-items:center;gap:9px;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.toast.show{transform:translateY(0);opacity:1}
+/* FOUNDATION DAY BOX */
+.fdbox{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+/* RESPONSIVE */
+@media(max-width:900px){
+  .hw{grid-template-columns:1fr;text-align:center}
+  .hdesc,.hloc{margin-left:auto;margin-right:auto;text-align:left;justify-content:center}
+  .hbtns,.hstats{justify-content:center}
+  .hro{display:none}
+  .agrid{grid-template-columns:1fr}
+  .ac .sec-title,.ac .divider{text-align:center;margin-left:auto}
+  .agr{grid-template-columns:1fr 1fr}
+  .cgr{grid-template-columns:1fr 1fr}
+  .stbg{grid-template-columns:1fr 1fr}
+  .sti:nth-child(2){border-right:none}
+  .ftgr{grid-template-columns:1fr 1fr}
+  .fdbox{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .nl{display:none}.hbg{display:flex}
+  .sp{padding:58px 0}
+  .agr{grid-template-columns:1fr}
+  .ftgr{grid-template-columns:1fr}
+  .ahi{grid-template-columns:1fr}
+  .nr .lang-sw{display:none}
+}
+@media(max-width:460px){.cgr{grid-template-columns:1fr}.ftbot{flex-direction:column;text-align:center}}
+</style>
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23ff6b35'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E⚽%3C/text%3E%3C/svg%3E" alt="Young Sporting Club Logo">
-                <h1>Young Sporting Club</h1>
-            </div>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="#" class="active" onclick="showPage('home')">Home</a></li>
-                <li><a href="#" onclick="showPage('about')">About</a></li>
-                <li><a href="#" onclick="showPage('members')">Members</a></li>
-                <li><a href="#" onclick="showPage('addMember')" id="addMemberLink" style="display:none;">Add Member</a></li>
-                <li><a href="#" onclick="showPage('login')" id="loginLink">Login</a></li>
-                <li><a href="#" onclick="showPage('contact')">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
 
-    <main id="main-content">
-        <!-- Home Page -->
-        <div id="home-page" class="page active">
-            <!-- Hero Section -->
-            <section class="hero">
-                <div class="hero-content" data-aos="fade-right">
-                    <h2>Welcome to Young Sporting Club</h2>
-                    <p>Empowering youth through sports, fostering community spirit, and building champions since 1995.</p>
-                    <a href="#" onclick="showPage('contact')" class="cta-button">Join Our Club</a>
-                </div>
-                <div class="hero-animation" data-aos="fade-left">
-                    <div id="lottie-hero" class="lottie-container"></div>
-                </div>
-            </section>
+<div class="ldr" id="ldr"><div class="lring"></div><div class="ltxt">YSC</div></div>
 
-            <!-- Club Introduction -->
-            <section class="club-intro" data-aos="fade-up">
-                <h2 class="section-title">About Our Club</h2>
-                <div class="cards-grid">
-                    <div class="card" data-aos="flip-left" data-aos-delay="100">
-                        <div class="card-content">
-                            <i class="fas fa-futbol fa-3x" style="color: var(--accent-color); margin-bottom: 1rem;"></i>
-                            <h3>Sports Excellence</h3>
-                            <p>We provide top-notch training facilities and coaching for various sports including football, cricket, basketball, and athletics.</p>
-                        </div>
-                    </div>
-                    <div class="card" data-aos="flip-left" data-aos-delay="200">
-                        <div class="card-content">
-                            <i class="fas fa-users fa-3x" style="color: var(--accent-color); margin-bottom: 1rem;"></i>
-                            <h3>Community Building</h3>
-                            <p>We organize regular community events, tournaments, and social gatherings to foster friendship and teamwork.</p>
-                        </div>
-                    </div>
-                    <div class="card" data-aos="flip-left" data-aos-delay="300">
-                        <div class="card-content">
-                            <i class="fas fa-trophy fa-3x" style="color: var(--accent-color); margin-bottom: 1rem;"></i>
-                            <h3>Achievements</h3>
-                            <p>Our members have won numerous regional and national championships, making us proud.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+<!-- HEADER -->
+<header id="hdr">
+  <nav class="nav">
+    <a href="index.html" class="logo">
+      <div class="li">YSC</div>
+      <div class="lt"><span class="n1">YOUNG SPORTING</span><span class="n2" data-en="Est. 13 Jan 2009" data-bn="প্রতিষ্ঠা: ১৩ জানু ২০০৯">Est. 13 Jan 2009</span></div>
+    </a>
+    <div class="nl">
+      <a href="index.html" class="on" data-en="Home" data-bn="হোম">Home</a>
+      <a href="about.html" data-en="About" data-bn="সম্পর্কে">About</a>
+      <a href="members.html" data-en="Members" data-bn="সদস্য">Members</a>
+      <a href="add-member.html" data-en="Add Member" data-bn="সদস্য যোগ">Add Member</a>
+      <a href="contact.html" data-en="Contact" data-bn="যোগাযোগ">Contact</a>
+    </div>
+    <div class="nr">
+      <div class="lang-sw"><button class="lb on" onclick="setLang('en')">EN</button><button class="lb" onclick="setLang('bn')">বাং</button></div>
+      <a href="login.html" class="btn ncta" id="nav-login-btn" data-en="Login" data-bn="লগইন">Login</a>
+    </div>
+    <button class="hbg" id="hbg"><span></span><span></span><span></span></button>
+  </nav>
+  <div class="mob" id="mob">
+    <a href="index.html" class="on" data-en="Home" data-bn="হোম">Home</a>
+    <a href="about.html" data-en="About" data-bn="সম্পর্কে">About</a>
+    <a href="members.html" data-en="Members" data-bn="সদস্য">Members</a>
+    <a href="add-member.html" data-en="Add Member" data-bn="সদস্য যোগ">Add Member</a>
+    <a href="contact.html" data-en="Contact" data-bn="যোগাযোগ">Contact</a>
+    <a href="login.html" data-en="Login" data-bn="লগইন">Login</a>
+    <div class="lang-sw" style="margin-top:10px"><button class="lb on" onclick="setLang('en')">EN</button><button class="lb" onclick="setLang('bn')">বাং</button></div>
+  </div>
+</header>
 
-            <!-- Quick Stats -->
-            <section class="stats" data-aos="zoom-in">
-                <div class="stats-container">
-                    <div class="stat-item">
-                        <div class="stat-number" id="totalMembers">0</div>
-                        <div class="stat-label">Total Members</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="activeMembers">0</div>
-                        <div class="stat-label">Active Players</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="committeeMembers">0</div>
-                        <div class="stat-label">Committee Members</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">25+</div>
-                        <div class="stat-label">Years of Excellence</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Committee Members Preview -->
-            <section class="committee-preview" data-aos="fade-up">
-                <h2 class="section-title">Our Committee</h2>
-                <div class="cards-grid" id="committeePreview">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-                <div style="text-align: center; margin-top: 2rem;">
-                    <a href="#" onclick="showPage('members')" class="cta-button">View All Members</a>
-                </div>
-            </section>
-
-            <!-- Join Club CTA -->
-            <section id="join" class="join-cta" data-aos="fade-up" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; text-align: center; padding: 4rem 2rem;">
-                <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Ready to Join Us?</h2>
-                <p style="font-size: 1.2rem; margin-bottom: 2rem;">Become part of our growing family and experience the thrill of sports!</p>
-                <a href="#" onclick="showPage('contact')" class="cta-button" style="background: var(--accent-color);">Contact Us Today</a>
-            </section>
-
-            <!-- Social Links -->
-            <section class="social-section" data-aos="fade-up">
-                <h2 class="section-title">Connect With Us</h2>
-                <div class="social-links">
-                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                </div>
-            </section>
+<!-- HERO -->
+<section class="hero">
+  <div class="hbg2"></div><div class="hgrid"></div>
+  <div class="sportbg">
+    <span class="sb2">⚽</span><span class="sb2">🏏</span><span class="sb2">🏸</span>
+    <span class="sb2">🏆</span><span class="sb2">⚽</span><span class="sb2">🎽</span>
+    <span class="sb2">🏅</span><span class="sb2">🏏</span>
+  </div>
+  <div class="hw">
+    <div data-aos="fade-right" data-aos-duration="750">
+      <div class="hew"><span class="pd"></span><span data-en="Est. 13 January 2009" data-bn="প্রতিষ্ঠা: ১৩ জানুয়ারি ২০০৯">Est. 13 January 2009</span></div>
+      <h1 class="htitle">
+        <span class="l1" data-en="YOUNG" data-bn="ইয়াং">YOUNG</span>
+        <span class="l2" data-en="SPORTING" data-bn="স্পোর্টিং">SPORTING</span>
+        <span class="l1" data-en="CLUB" data-bn="ক্লাব">CLUB</span>
+      </h1>
+      <p class="hdesc" data-en="A community-based youth organization dedicated to sports development, youth engagement, and community service since 2009." data-bn="২০০৯ সাল থেকে ক্রীড়া উন্নয়ন, যুব সম্পৃক্ততা এবং সামাজিক সেবায় নিবেদিত একটি সমাজভিত্তিক যুব সংগঠন।">A community-based youth organization dedicated to sports development, youth engagement, and community service since 2009.</p>
+      <div class="hloc"><i class="fas fa-map-marker-alt"></i><span data-en="Shingrahully, Shamsher Nagar, Kamalganj, Moulvibazar, Sylhet" data-bn="শিংড়াউলী, শমশেরনগর, কমলগঞ্জ, মৌলভীবাজার, সিলেট">Shingrahully, Shamsher Nagar, Kamalganj, Moulvibazar, Sylhet</span></div>
+      <div class="hbtns">
+        <a href="members.html" class="btn btn-pk"><i class="fas fa-users"></i> <span data-en="View Members" data-bn="সদস্যদের দেখুন">View Members</span></a>
+        <a href="about.html" class="btn btn-ol"><i class="fas fa-info-circle"></i> <span data-en="Our Story" data-bn="আমাদের গল্প">Our Story</span></a>
+      </div>
+      <div class="hstats">
+        <div class="hst"><div class="num">15<sup>+</sup></div><div class="lbl" data-en="Years Active" data-bn="বছর সক্রিয়">Years Active</div></div>
+        <div class="hst"><div class="num">100<sup>+</sup></div><div class="lbl" data-en="Members" data-bn="সদস্য">Members</div></div>
+        <div class="hst"><div class="num">50<sup>+</sup></div><div class="lbl" data-en="Events" data-bn="ইভেন্ট">Events</div></div>
+      </div>
+    </div>
+    <div class="hro" data-aos="fade-left" data-aos-delay="200">
+      <div class="bring">
+        <div class="binn">
+          <div class="btr">🏆</div>
+          <div class="best">YSC · 2009</div>
+          <div class="bsp"><span>⚽</span><span>🏏</span><span>🏸</span></div>
         </div>
+      </div>
+      <div class="borb"><div class="bdot"></div></div>
+    </div>
+  </div>
+  <div class="hscr"><div class="scrl"></div><span data-en="SCROLL" data-bn="স্ক্রল">SCROLL</span></div>
+</section>
 
-        <!-- About Page -->
-        <div id="about-page" class="page" style="display:none;">
-            <section class="page-header" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 4rem 5%; text-align: center;">
-                <h1 style="font-size: 3rem; margin-bottom: 1rem;" data-aos="fade-down">About Young Sporting Club</h1>
-                <p style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;" data-aos="fade-up">Discover our journey, mission, and the values that drive us forward</p>
-            </section>
+<!-- STATS BAND -->
+<div class="stb" data-aos="fade-up">
+  <div class="container">
+    <div class="stbg">
+      <div class="sti"><div class="sn" data-target="100">0</div><div class="sl" data-en="Total Members" data-bn="মোট সদস্য">Total Members</div></div>
+      <div class="sti"><div class="sn" data-target="50">0</div><div class="sl" data-en="Events Held" data-bn="অনুষ্ঠিত ইভেন্ট">Events Held</div></div>
+      <div class="sti"><div class="sn" data-target="15">0</div><div class="sl" data-en="Years Strong" data-bn="বছর শক্তিশালী">Years Strong</div></div>
+      <div class="sti"><div class="sn" data-target="10">0</div><div class="sl" data-en="Trophies Won" data-bn="ট্রফি অর্জন">Trophies Won</div></div>
+    </div>
+  </div>
+</div>
 
-            <section class="history" data-aos="fade-up" style="padding: 5rem 5%;">
-                <div style="max-width: 1200px; margin: 0 auto;">
-                    <h2 class="section-title">Our History</h2>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
-                        <div data-aos="fade-right">
-                            <p style="font-size: 1.1rem; line-height: 1.8;">Founded in 1995 by a group of passionate sports enthusiasts, Young Sporting Club has grown from a small community initiative to one of the most respected sports organizations in the region. Over the past 25+ years, we have nurtured countless talents and built a strong community of athletes, coaches, and supporters.</p>
-                            <p style="font-size: 1.1rem; line-height: 1.8; margin-top: 1rem;">What started as a weekend football club has now expanded to include multiple sports disciplines, professional training programs, and community outreach initiatives that touch thousands of lives every year.</p>
-                        </div>
-                        <div class="history-animation" data-aos="fade-left">
-                            <div id="lottie-history" style="height: 300px;"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="mission-vision" style="background: var(--bg-light); padding: 5rem 5%;" data-aos="fade-up">
-                <div style="max-width: 1200px; margin: 0 auto;">
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem;">
-                        <div class="card" data-aos="flip-left">
-                            <div class="card-content">
-                                <i class="fas fa-bullseye fa-3x" style="color: var(--accent-color); margin-bottom: 1rem;"></i>
-                                <h3>Our Mission</h3>
-                                <p>To inspire and empower individuals through sports, fostering teamwork, discipline, and excellence while building a strong, inclusive community.</p>
-                            </div>
-                        </div>
-                        <div class="card" data-aos="flip-left" data-aos-delay="200">
-                            <div class="card-content">
-                                <i class="fas fa-eye fa-3x" style="color: var(--accent-color); margin-bottom: 1rem;"></i>
-                                <h3>Our Vision</h3>
-                                <p>To become a leading sports organization that develops world-class athletes and promotes sports as a tool for social change and community development.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="activities" data-aos="fade-up" style="padding: 5rem 5%;">
-                <div style="max-width: 1200px; margin: 0 auto;">
-                    <h2 class="section-title">Our Activities</h2>
-                    <div class="cards-grid">
-                        <div class="card" data-aos="fade-up" data-aos-delay="100">
-                            <div class="card-content">
-                                <i class="fas fa-futbol fa-3x" style="color: var(--accent-color);"></i>
-                                <h3>Sports Activities</h3>
-                                <ul style="list-style: none; margin-top: 1rem;">
-                                    <li>✓ Football Training</li>
-                                    <li>✓ Cricket Academy</li>
-                                    <li>✓ Basketball League</li>
-                                    <li>✓ Athletics Program</li>
-                                    <li>✓ Swimming Classes</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="card" data-aos="fade-up" data-aos-delay="200">
-                            <div class="card-content">
-                                <i class="fas fa-hand-holding-heart fa-3x" style="color: var(--accent-color);"></i>
-                                <h3>Social Activities</h3>
-                                <ul style="list-style: none; margin-top: 1rem;">
-                                    <li>✓ Community Outreach</li>
-                                    <li>✓ Youth Development</li>
-                                    <li>✓ Charity Tournaments</li>
-                                    <li>✓ Sports Camps for Kids</li>
-                                    <li>✓ Health Awareness</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="card" data-aos="fade-up" data-aos-delay="300">
-                            <div class="card-content">
-                                <i class="fas fa-palette fa-3x" style="color: var(--accent-color);"></i>
-                                <h3>Cultural Activities</h3>
-                                <ul style="list-style: none; margin-top: 1rem;">
-                                    <li>✓ Annual Sports Day</li>
-                                    <li>✓ Cultural Festivals</li>
-                                    <li>✓ Award Ceremonies</li>
-                                    <li>✓ Family Fun Days</li>
-                                    <li>✓ Community Gatherings</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="future-plans" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 5rem 5%;" data-aos="fade-up">
-                <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
-                    <h2 style="font-size: 2.5rem; margin-bottom: 2rem;">Future Plans</h2>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
-                        <div data-aos="zoom-in" data-aos-delay="100">
-                            <i class="fas fa-building fa-3x" style="margin-bottom: 1rem;"></i>
-                            <h3>New Training Facility</h3>
-                            <p>State-of-the-art sports complex with modern equipment</p>
-                        </div>
-                        <div data-aos="zoom-in" data-aos-delay="200">
-                            <i class="fas fa-chart-line fa-3x" style="margin-bottom: 1rem;"></i>
-                            <h3>Youth Academy</h3>
-                            <p>Professional training programs for young athletes</p>
-                        </div>
-                        <div data-aos="zoom-in" data-aos-delay="300">
-                            <i class="fas fa-globe fa-3x" style="margin-bottom: 1rem;"></i>
-                            <h3>International Exchange</h3>
-                            <p>Partnerships with global sports organizations</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+<!-- ABOUT -->
+<section class="sp" style="background:var(--bg)">
+  <div class="container">
+    <div class="agrid">
+      <div class="avis" data-aos="fade-right">
+        <div class="afr">
+          <div class="afrbg"></div>
+          <svg width="78%" viewBox="0 0 400 270" fill="none" style="position:relative;z-index:1">
+            <rect x="10" y="10" width="380" height="250" stroke="#FE2C55" stroke-width="1.5" fill="none" opacity=".18"/>
+            <circle cx="200" cy="135" r="52" stroke="#25F4EE" stroke-width="1.5" fill="none" opacity=".18"/>
+            <line x1="200" y1="10" x2="200" y2="260" stroke="#FE2C55" stroke-width="1.5" opacity=".12"/>
+            <rect x="10" y="77" width="62" height="118" stroke="#25F4EE" stroke-width="1.5" fill="none" opacity=".15"/>
+            <rect x="328" y="77" width="62" height="118" stroke="#25F4EE" stroke-width="1.5" fill="none" opacity=".15"/>
+            <circle cx="200" cy="135" r="4" fill="#FE2C55" opacity=".5"/>
+          </svg>
+          <div class="afrwm">YSC</div>
         </div>
-
-        <!-- Members Page -->
-        <div id="members-page" class="page" style="display:none;">
-            <section class="page-header" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 4rem 5%; text-align: center;">
-                <h1 style="font-size: 3rem; margin-bottom: 1rem;" data-aos="fade-down">Our Members</h1>
-                <p style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;" data-aos="fade-up">Meet the passionate individuals who make our club great</p>
-            </section>
-
-            <section class="members-section" style="padding: 3rem 5%;">
-                <div style="max-width: 1400px; margin: 0 auto;">
-                    <div class="filter-section" data-aos="fade-up">
-                        <input type="text" id="searchMember" placeholder="Search by name, phone, or address...">
-                        <select id="filterPosition">
-                            <option value="">All Positions</option>
-                            <option value="President">President</option>
-                            <option value="Vice President">Vice President</option>
-                            <option value="Secretary">Secretary</option>
-                            <option value="Joint Secretary">Joint Secretary</option>
-                            <option value="Treasurer">Treasurer</option>
-                            <option value="Member">Member</option>
-                        </select>
-                    </div>
-
-                    <div class="table-container" data-aos="fade-up" data-aos-delay="200">
-                        <table class="members-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Position</th>
-                                    <th>Phone</th>
-                                    <th>Address</th>
-                                    <th>Join Year</th>
-                                    <th>Bio</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="membersTableBody">
-                                <tr>
-                                    <td colspan="7" style="text-align: center;">
-                                        <div class="loading-spinner"></div>
-                                        <p>Loading members...</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
+        <div class="abc"><div class="yr">2009</div><div class="sn2" data-en="Founded" data-bn="প্রতিষ্ঠিত">Founded</div></div>
+      </div>
+      <div class="ac" data-aos="fade-left" data-aos-delay="150">
+        <span class="bdg"><span class="dot"></span><span data-en="Who We Are" data-bn="আমরা কারা">Who We Are</span></span>
+        <h2 class="sec-title" data-en="More Than Just A Sports Club" data-bn="শুধু একটি স্পোর্টস ক্লাব নয়">More Than Just A<br><span style="background:linear-gradient(90deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Sports Club</span></h2>
+        <div class="divider"></div>
+        <p class="atxt" data-en="Young Sporting Club was founded on 13 January 2009 by enthusiastic young people in Shingrahully, Shamsher Nagar, Kamalganj, Moulvibazar." data-bn="ইয়াং স্পোর্টিং ক্লাব ২০০৯ সালের ১৩ জানুয়ারি মৌলভীবাজারের কমলগঞ্জ, শমশেরনগরের শিংড়াউলীর উৎসাহী তরুণদের দ্বারা প্রতিষ্ঠিত হয়।">Young Sporting Club was founded on 13 January 2009 by enthusiastic young people in Shingrahully, Shamsher Nagar, Kamalganj, Moulvibazar.</p>
+        <p class="atxt" data-en="For over 15 years, the club has been a home for young athletes building teamwork, character and community spirit through sports and social activities." data-bn="১৫ বছরেরও বেশি সময় ধরে এই ক্লাব তরুণ ক্রীড়াবিদদের দলগত কাজ, চরিত্র গঠন এবং খেলাধুলা ও সামাজিক কার্যকলাপের মাধ্যমে সম্প্রদায়ের মনোভাব তৈরির ঘর হয়ে উঠেছে।">For over 15 years, the club has been a home for young athletes building teamwork, character and community spirit through sports and social activities.</p>
+        <div class="ahi">
+          <div class="hit"><div class="hic">⚽</div><span data-en="Football & Cricket" data-bn="ফুটবল ও ক্রিকেট">Football & Cricket</span></div>
+          <div class="hit"><div class="hic">🏸</div><span data-en="Badminton Events" data-bn="ব্যাডমিন্টন ইভেন্ট">Badminton Events</span></div>
+          <div class="hit"><div class="hic">🤝</div><span data-en="Community Service" data-bn="সামাজিক সেবা">Community Service</span></div>
+          <div class="hit"><div class="hic">🎉</div><span data-en="Cultural Programs" data-bn="সাংস্কৃতিক অনুষ্ঠান">Cultural Programs</span></div>
         </div>
+        <a href="about.html" class="btn btn-pk"><i class="fas fa-arrow-right"></i> <span data-en="Read Full Story" data-bn="পুরো গল্প পড়ুন">Read Full Story</span></a>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <!-- Add Member Page -->
-        <div id="addMember-page" class="page" style="display:none;">
-            <section class="page-header" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 4rem 5%; text-align: center;">
-                <h1 style="font-size: 3rem; margin-bottom: 1rem;" data-aos="fade-down" id="formTitle">Add New Member</h1>
-                <p style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;" data-aos="fade-up">Add a new member to the Young Sporting Club family</p>
-            </section>
+<!-- ACHIEVEMENTS -->
+<section class="sp asec">
+  <div class="container">
+    <div class="tc" data-aos="fade-up">
+      <span class="bdg"><span class="dot"></span><span data-en="Our Victories" data-bn="আমাদের অর্জন">Our Victories</span></span>
+      <h2 class="sec-title"><span data-en="Achievements &" data-bn="অর্জন ও">Achievements &</span> <span style="color:var(--cyan)" data-en="Milestones" data-bn="মাইলফলক">Milestones</span></h2>
+      <div class="divider"></div>
+      <p class="sub" data-en="Years of dedication and teamwork have earned us these proud moments." data-bn="বছরের পর বছর নিষ্ঠা ও দলগত কাজ আমাদের এই গর্বিত মুহূর্তগুলো এনে দিয়েছে।">Years of dedication and teamwork have earned us these proud moments.</p>
+    </div>
+    <div class="agr">
+      <div class="ac2" data-aos="fade-up"><div class="aic">⚽</div><h3 data-en="Football Tournaments" data-bn="ফুটবল টুর্নামেন্ট">Football Tournaments</h3><p data-en="Actively participated in local football leagues and tournaments across Moulvibazar district." data-bn="মৌলভীবাজার জেলায় স্থানীয় ফুটবল লিগ ও টুর্নামেন্টে সক্রিয়ভাবে অংশগ্রহণ করেছে।">Actively participated in local football leagues and tournaments across Moulvibazar district.</p><span class="ayr">2009 – Ongoing</span></div>
+      <div class="ac2" data-aos="fade-up" data-aos-delay="100"><div class="aic">🏏</div><h3 data-en="Cricket Development" data-bn="ক্রিকেট উন্নয়ন">Cricket Development</h3><p data-en="Promoted cricket with regular matches, training sessions and inter-club competitions." data-bn="নিয়মিত ম্যাচ, প্রশিক্ষণ সেশন এবং ক্লাবের মধ্যে প্রতিযোগিতার মাধ্যমে ক্রিকেটকে প্রসারিত করেছে।">Promoted cricket with regular matches, training sessions and inter-club competitions.</p><span class="ayr">2010 – Ongoing</span></div>
+      <div class="ac2" data-aos="fade-up" data-aos-delay="200"><div class="aic">🏆</div><h3 data-en="Community Recognition" data-bn="সামাজিক স্বীকৃতি">Community Recognition</h3><p data-en="Recognized as an active youth organization contributing to sports and community welfare in the region." data-bn="এই অঞ্চলে ক্রীড়া উন্নয়ন এবং সামাজিক কল্যাণে অবদান রাখার জন্য স্বীকৃত।">Recognized as an active youth organization contributing to sports and community welfare in the region.</p><span class="ayr">2015</span></div>
+      <div class="ac2" data-aos="fade-up"><div class="aic">🎽</div><h3 data-en="Youth Training" data-bn="যুব প্রশিক্ষণ">Youth Training</h3><p data-en="Conducted youth sports training programs inspiring dozens of young athletes to pursue sports." data-bn="তরুণ ক্রীড়াবিদদের অনুপ্রাণিত করে যুব ক্রীড়া প্রশিক্ষণ কার্যক্রম পরিচালনা করেছে।">Conducted youth sports training programs inspiring dozens of young athletes to pursue sports.</p><span class="ayr">Ongoing</span></div>
+      <div class="ac2" data-aos="fade-up" data-aos-delay="100"><div class="aic">🎭</div><h3 data-en="Cultural Events" data-bn="সাংস্কৃতিক অনুষ্ঠান">Cultural Events</h3><p data-en="Organized annual cultural programs, Eid celebrations and community gatherings for the locality." data-bn="বার্ষিক সাংস্কৃতিক অনুষ্ঠান, ঈদ উদযাপন এবং সামাজিক সমাবেশ আয়োজন করেছে।">Organized annual cultural programs, Eid celebrations and community gatherings for the locality.</p><span class="ayr">Annual</span></div>
+      <div class="ac2" data-aos="fade-up" data-aos-delay="200"><div class="aic">🤝</div><h3 data-en="Social Welfare" data-bn="সমাজকল্যাণ">Social Welfare</h3><p data-en="Conducted social service activities including community support and local development initiatives." data-bn="সামাজিক সহায়তা এবং স্থানীয় উন্নয়ন উদ্যোগসহ সমাজসেবামূলক কার্যক্রম পরিচালনা করেছে।">Conducted social service activities including community support and local development initiatives.</p><span class="ayr">2009 – Ongoing</span></div>
+    </div>
+  </div>
+</section>
 
-            <section class="form-section" style="padding: 3rem 5%;">
-                <div class="form-container" data-aos="fade-up">
-                    <form id="addMemberForm" onsubmit="event.preventDefault(); addMember(event);">
-                        <div class="form-group">
-                            <label for="name">Full Name *</label>
-                            <input type="text" id="name" name="name" required placeholder="Enter member's full name">
-                        </div>
+<!-- COMMITTEE -->
+<section class="sp" style="background:var(--bg)">
+  <div class="container">
+    <div class="tc" data-aos="fade-up">
+      <span class="bdg"><span class="dot"></span><span data-en="Leadership" data-bn="নেতৃত্ব">Leadership</span></span>
+      <h2 class="sec-title" data-en="Club Committee" data-bn="ক্লাব কমিটি">Club Committee</h2>
+      <div class="divider"></div>
+      <p class="sub" data-en="The dedicated leaders who keep Young Sporting Club running and the spirit alive." data-bn="যারা ইয়াং স্পোর্টিং ক্লাবকে সচল রাখেন এবং চেতনাকে জীবন্ত রাখেন।">The dedicated leaders who keep Young Sporting Club running and the spirit alive.</p>
+    </div>
+    <div class="cgr">
+      <div class="cc" data-aos="fade-up"><div class="cav">প</div><h4 data-en="[President Name]" data-bn="[সভাপতির নাম]">[President Name]</h4><div class="role" data-en="President" data-bn="সভাপতি">President</div></div>
+      <div class="cc" data-aos="fade-up" data-aos-delay="80"><div class="cav">উ</div><h4 data-en="[Vice President]" data-bn="[সহ-সভাপতি]">[Vice President]</h4><div class="role" data-en="Vice President" data-bn="সহ-সভাপতি">Vice President</div></div>
+      <div class="cc" data-aos="fade-up" data-aos-delay="160"><div class="cav">স</div><h4 data-en="[Gen. Secretary]" data-bn="[সাধারণ সম্পাদক]">[Gen. Secretary]</h4><div class="role" data-en="General Secretary" data-bn="সাধারণ সম্পাদক">General Secretary</div></div>
+      <div class="cc" data-aos="fade-up" data-aos-delay="240"><div class="cav">ক</div><h4 data-en="[Treasurer]" data-bn="[কোষাধ্যক্ষ]">[Treasurer]</h4><div class="role" data-en="Treasurer" data-bn="কোষাধ্যক্ষ">Treasurer</div></div>
+    </div>
+    <div class="tc" style="margin-top:8px" data-aos="fade-up">
+      <a href="members.html" class="btn btn-ol"><i class="fas fa-users"></i> <span data-en="View All Members" data-bn="সকল সদস্য দেখুন">View All Members</span></a>
+    </div>
+  </div>
+</section>
 
-                        <div class="form-group">
-                            <label for="position">Position *</label>
-                            <select id="position" name="position" required>
-                                <option value="">Select Position</option>
-                                <option value="President">President</option>
-                                <option value="Vice President">Vice President</option>
-                                <option value="Secretary">Secretary</option>
-                                <option value="Joint Secretary">Joint Secretary</option>
-                                <option value="Treasurer">Treasurer</option>
-                                <option value="Member">Member</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="phone">Phone Number *</label>
-                            <input type="tel" id="phone" name="phone" required placeholder="Enter phone number">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="address">Address</label>
-                            <input type="text" id="address" name="address" placeholder="Enter full address">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="joinYear">Join Year</label>
-                            <input type="number" id="joinYear" name="joinYear" min="1995" max="2024" placeholder="Enter join year">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="bio">Short Bio</label>
-                            <textarea id="bio" name="bio" rows="4" placeholder="Write a brief bio about the member"></textarea>
-                        </div>
-
-                        <button type="submit" class="submit-btn" id="submitBtn">Add Member</button>
-                    </form>
-                </div>
-            </section>
+<!-- FOUNDATION DAY -->
+<section class="sp" style="background:var(--card)">
+  <div class="container">
+    <div class="fdbox" data-aos="fade-up">
+      <div>
+        <span class="bdg"><span class="dot"></span><span data-en="Annual Celebration" data-bn="বার্ষিক উদযাপন">Annual Celebration</span></span>
+        <h2 class="sec-title" data-en="Foundation Day" data-bn="প্রতিষ্ঠা বার্ষিকী">Foundation Day</h2>
+        <div class="divider" style="margin-left:0"></div>
+        <p class="atxt" data-en="Every year on 13 January, Young Sporting Club celebrates its Foundation Day — marking the club's establishment in 2009 with great enthusiasm and community spirit." data-bn="প্রতি বছর ১৩ জানুয়ারি ইয়াং স্পোর্টিং ক্লাব তার প্রতিষ্ঠা বার্ষিকী উদযাপন করে — ২০০৯ সালে ক্লাবের প্রতিষ্ঠার স্মরণে ব্যাপক উৎসাহ ও সামাজিক চেতনার সাথে।">Every year on 13 January, Young Sporting Club celebrates its Foundation Day — marking the club's establishment in 2009 with great enthusiasm and community spirit.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px">
+          <div class="hit"><div class="hic">⚽</div><span data-en="Friendly Football Matches" data-bn="প্রীতি ফুটবল ম্যাচ">Friendly Football Matches</span></div>
+          <div class="hit"><div class="hic">🎭</div><span data-en="Cultural Programs" data-bn="সাংস্কৃতিক অনুষ্ঠান">Cultural Programs</span></div>
+          <div class="hit"><div class="hic">🏅</div><span data-en="Member Recognition Ceremony" data-bn="সদস্য সম্মাননা অনুষ্ঠান">Member Recognition Ceremony</span></div>
         </div>
-
-        <!-- Login Page -->
-        <div id="login-page" class="page" style="display:none;">
-            <section class="page-header" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 4rem 5%; text-align: center;">
-                <h1 style="font-size: 3rem; margin-bottom: 1rem;" data-aos="fade-down">Welcome Back!</h1>
-                <p style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;" data-aos="fade-up">Login to access member management features</p>
-            </section>
-
-            <section class="login-section" style="padding: 3rem 5%;">
-                <div class="form-container" data-aos="fade-up">
-                    <form id="emailLoginForm" onsubmit="handleEmailLogin(event)">
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" required placeholder="Enter your email">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" id="password" name="password" required placeholder="Enter your password">
-                        </div>
-
-                        <button type="submit" class="submit-btn">Login with Email</button>
-                    </form>
-
-                    <div style="text-align: center; margin: 2rem 0; position: relative;">
-                        <hr style="border: none; border-top: 1px solid var(--bg-light);">
-                        <span style="position: relative; top: -12px; background: white; padding: 0 1rem; color: var(--text-dark);">OR</span>
-                    </div>
-
-                    <div class="auth-buttons">
-                        <button class="auth-btn google" onclick="handleGoogleLogin()">
-                            <i class="fab fa-google"></i>
-                            Login with Google
-                        </button>
-                    </div>
-
-                    <div style="text-align: center; margin-top: 2rem;">
-                        <p>Don't have an account? <a href="#" onclick="showRegisterForm()" style="color: var(--accent-color);">Register here</a></p>
-                        <p style="margin-top: 0.5rem;"><a href="#" onclick="showForgotPassword()" style="color: var(--primary-color);">Forgot Password?</a></p>
-                    </div>
-                </div>
-
-                <div id="registerForm" style="display: none;" class="form-container" data-aos="fade-up">
-                    <h2 style="text-align: center; margin-bottom: 2rem;">Create Account</h2>
-                    <form onsubmit="handleRegister(event)">
-                        <div class="form-group">
-                            <label for="regEmail">Email Address</label>
-                            <input type="email" id="regEmail" required placeholder="Enter your email">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="regPassword">Password</label>
-                            <input type="password" id="regPassword" required placeholder="Choose a password">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="confirmPassword">Confirm Password</label>
-                            <input type="password" id="confirmPassword" required placeholder="Confirm your password">
-                        </div>
-
-                        <button type="submit" class="submit-btn">Register</button>
-                    </form>
-                    <div style="text-align: center; margin-top: 1rem;">
-                        <a href="#" onclick="showLoginForm()">Back to Login</a>
-                    </div>
-                </div>
-            </section>
+      </div>
+      <div class="tc" data-aos="fade-left" data-aos-delay="150">
+        <div style="width:220px;height:220px;border-radius:50%;background:linear-gradient(135deg,rgba(254,44,85,.15),rgba(37,244,238,.1));border:2px solid var(--bp);margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 40px rgba(254,44,85,.2),0 0 70px rgba(37,244,238,.1)">
+          <div style="font-size:52px">🎂</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;background:linear-gradient(90deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">13 JAN</div>
+          <div style="font-size:11px;color:var(--gr);letter-spacing:2px" data-en="FOUNDATION DAY" data-bn="প্রতিষ্ঠা দিবস">FOUNDATION DAY</div>
+          <div style="font-size:13px;color:var(--lt);font-weight:600" data-en="Since 2009" data-bn="২০০৯ সাল থেকে">Since 2009</div>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <!-- Contact Page -->
-        <div id="contact-page" class="page" style="display:none;">
-            <section class="page-header" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 4rem 5%; text-align: center;">
-                <h1 style="font-size: 3rem; margin-bottom: 1rem;" data-aos="fade-down">Get In Touch</h1>
-                <p style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;" data-aos="fade-up">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
-            </section>
+<!-- CTA -->
+<section class="sp ctasec">
+  <div class="container" data-aos="zoom-in">
+    <span class="bdg"><span class="dot"></span><span data-en="Join Us" data-bn="আমাদের সাথে যোগ দিন">Join Us</span></span>
+    <h2 class="sec-title" data-en="Be Part of the" data-bn="এর অংশ হোন">Be Part of the</h2>
+    <h2 class="sec-title" style="background:linear-gradient(90deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-top:-4px" data-en="Winning Team!" data-bn="বিজয়ী দলের!">Winning Team!</h2>
+    <p data-en="Whether you're a passionate athlete or want to be part of a vibrant community — Young Sporting Club welcomes you!" data-bn="আপনি একজন উৎসাহী খেলোয়াড় হোন বা একটি প্রাণবন্ত সম্প্রদায়ের অংশ হতে চান — ইয়াং স্পোর্টিং ক্লাব আপনাকে স্বাগত জানায়!">Whether you're a passionate athlete or want to be part of a vibrant community — Young Sporting Club welcomes you!</p>
+    <div class="ctabtns">
+      <a href="add-member.html" class="btn btn-pk"><i class="fas fa-user-plus"></i> <span data-en="Become a Member" data-bn="সদস্য হোন">Become a Member</span></a>
+      <a href="contact.html" class="btn btn-cy"><i class="fas fa-envelope"></i> <span data-en="Get in Touch" data-bn="যোগাযোগ করুন">Get in Touch</span></a>
+    </div>
+  </div>
+</section>
 
-            <section class="contact-section" style="padding: 3rem 5%;">
-                <div style="max-width: 1200px; margin: 0 auto;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start;">
-                        <div class="contact-info" data-aos="fade-right">
-                            <div class="card" style="margin-bottom: 2rem;">
-                                <div class="card-content">
-                                    <h3>Visit Us</h3>
-                                    <p><i class="fas fa-map-marker-alt" style="color: var(--accent-color); margin-right: 0.5rem;"></i> 123 Sports Avenue, City, State 12345</p>
-                                    <p><i class="fas fa-phone" style="color: var(--accent-color); margin-right: 0.5rem;"></i> +1 (234) 567-8900</p>
-                                    <p><i class="fas fa-envelope" style="color: var(--accent-color); margin-right: 0.5rem;"></i> info@youngsportingclub.com</p>
-                                </div>
-                            </div>
-
-                            <div class="card">
-                                <div class="card-content">
-                                    <h3>Opening Hours</h3>
-                                    <p><strong>Monday - Friday:</strong> 9:00 AM - 8:00 PM</p>
-                                    <p><strong>Saturday:</strong> 10:00 AM - 6:00 PM</p>
-                                    <p><strong>Sunday:</strong> Closed</p>
-                                </div>
-                            </div>
-
-                            <div class="social-links" style="justify-content: flex-start; margin-top: 2rem;">
-                                <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
-                                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                            </div>
-                        </div>
-
-                        <div class="contact-form" data-aos="fade-left">
-                            <div class="form-container" style="padding: 2rem;">
-                                <h3 style="margin-bottom: 2rem;">Send Message</h3>
-                                <form id="contactForm" onsubmit="handleContactSubmit(event)">
-                                    <div class="form-group">
-                                        <label for="contactName">Your Name *</label>
-                                        <input type="text" id="contactName" name="name" required placeholder="Enter your full name">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="contactEmail">Your Email *</label>
-                                        <input type="email" id="contactEmail" name="email" required placeholder="Enter your email">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="contactMessage">Message *</label>
-                                        <textarea id="contactMessage" name="message" rows="6" required placeholder="Write your message here..."></textarea>
-                                    </div>
-
-                                    <button type="submit" class="submit-btn">Send Message</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="ftgr">
+      <div>
+        <div class="logo"><div class="li">YSC</div><div class="lt"><span class="n1">YOUNG SPORTING CLUB</span><span class="n2" data-en="Est. 13 Jan 2009" data-bn="প্রতিষ্ঠা: ১৩ জান ২০০৯">Est. 13 Jan 2009</span></div></div>
+        <p class="ftdesc" data-en="A community-based youth organization dedicated to sports development, youth engagement, and community service in Shingrahully, Shamsher Nagar, Moulvibazar since 2009." data-bn="২০০৯ সাল থেকে মৌলভীবাজারের শমশেরনগর, শিংড়াউলীতে ক্রীড়া উন্নয়ন, যুব সম্পৃক্ততা এবং সামাজিক সেবায় নিবেদিত একটি সমাজভিত্তিক যুব সংগঠন।">A community-based youth organization dedicated to sports development, youth engagement, and community service in Shingrahully, Shamsher Nagar, Moulvibazar since 2009.</p>
+        <div class="slnks">
+          <a href="#" class="sa fb"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="sa yt"><i class="fab fa-youtube"></i></a>
+          <a href="#" class="sa ig"><i class="fab fa-instagram"></i></a>
+          <a href="mailto:support.youngsportingclub@gmail.com" class="sa em"><i class="fas fa-envelope"></i></a>
         </div>
-    </main>
+      </div>
+      <div class="fcol">
+        <h4 data-en="Quick Links" data-bn="দ্রুত লিংক">Quick Links</h4>
+        <ul>
+          <li><a href="index.html" data-en="Home" data-bn="হোম">Home</a></li>
+          <li><a href="about.html" data-en="About Us" data-bn="আমাদের সম্পর্কে">About Us</a></li>
+          <li><a href="members.html" data-en="Members" data-bn="সদস্য">Members</a></li>
+          <li><a href="add-member.html" data-en="Add Member" data-bn="সদস্য যোগ">Add Member</a></li>
+          <li><a href="contact.html" data-en="Contact" data-bn="যোগাযোগ">Contact</a></li>
+        </ul>
+      </div>
+      <div class="fcol">
+        <h4 data-en="Our Sports" data-bn="আমাদের খেলা">Our Sports</h4>
+        <ul>
+          <li><a href="#" data-en="⚽ Football" data-bn="⚽ ফুটবল">⚽ Football</a></li>
+          <li><a href="#" data-en="🏏 Cricket" data-bn="🏏 ক্রিকেট">🏏 Cricket</a></li>
+          <li><a href="#" data-en="🏸 Badminton" data-bn="🏸 ব্যাডমিন্টন">🏸 Badminton</a></li>
+          <li><a href="#" data-en="🎽 Youth Training" data-bn="🎽 যুব প্রশিক্ষণ">🎽 Youth Training</a></li>
+          <li><a href="#" data-en="🎭 Cultural Events" data-bn="🎭 সাংস্কৃতিক অনুষ্ঠান">🎭 Cultural Events</a></li>
+        </ul>
+      </div>
+      <div class="fcol">
+        <h4 data-en="Contact Us" data-bn="যোগাযোগ">Contact Us</h4>
+        <ul class="ci2">
+          <li><span class="ico"><i class="fas fa-map-marker-alt"></i></span><span data-en="Shingrahully, Shamsher Nagar, Kamalganj, Moulvibazar, Sylhet, Bangladesh" data-bn="শিংড়াউলী, শমশেরনগর, কমলগঞ্জ, মৌলভীবাজার, সিলেট, বাংলাদেশ">Shingrahully, Shamsher Nagar, Kamalganj, Moulvibazar, Sylhet, Bangladesh</span></li>
+          <li><span class="ico"><i class="fas fa-phone"></i></span><a href="tel:+8801724238581" style="color:var(--gr)">+880 1724-238581</a></li>
+          <li><span class="ico"><i class="fas fa-envelope"></i></span><a href="mailto:support.youngsportingclub@gmail.com" style="color:var(--gr);word-break:break-all">support.youngsportingclub@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ftbot">
+      <p data-en="© 2024 Young Sporting Club. All rights reserved." data-bn="© ২০২৪ ইয়াং স্পোর্টিং ক্লাব। সর্বস্বত্ব সংরক্ষিত।">© 2024 Young Sporting Club. All rights reserved.</p>
+      <p class="dev" data-en="Developed by <span>Farabi Walid</span>" data-bn="তৈরি করেছেন <span>ফারাবি ওয়ালিদ</span>">Developed by <span>Farabi Walid</span></p>
+    </div>
+  </div>
+</footer>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>Young Sporting Club</h3>
-                <p>Empowering youth through sports since 1995</p>
-                <div class="social-links" style="justify-content: flex-start;">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="#" onclick="showPage('about')">About Us</a></li>
-                    <li><a href="#" onclick="showPage('members')">Members</a></li>
-                    <li><a href="#" onclick="showPage('contact')">Contact</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Contact Info</h3>
-                <ul>
-                    <li><i class="fas fa-phone"></i> +1 234 567 890</li>
-                    <li><i class="fas fa-envelope"></i> info@youngsportingclub.com</li>
-                    <li><i class="fas fa-map-marker-alt"></i> 123 Sports Avenue, City</li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 Young Sporting Club. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- AOS Library -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    
-    <script>
-        // ==================== FIREBASE CONFIGURATION ====================
-        const firebaseConfig = {
-  apiKey: "AIzaSyD5QAGS-36neDTskPpEQjY835seWFCEq9o",
-  authDomain: "youngsportingclub.firebaseapp.com",
-  projectId: "youngsportingclub",
-  storageBucket: "youngsportingclub.firebasestorage.app",
-  messagingSenderId: "724732761340",
-  appId: "1:724732761340:web:dc664c10d55d5bb87cb379",
-  measurementId: "G-8VBTXPWVJE"
-};
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const membersCollection = db.collection('members');
-        const contactsCollection = db.collection('contacts');
-
-        // ==================== GLOBAL VARIABLES ====================
-        let allMembers = [];
-        let currentUser = null;
-
-        // ==================== PAGE NAVIGATION ====================
-        function showPage(pageName) {
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => {
-                page.style.display = 'none';
-            });
-            
-            // Show selected page
-            document.getElementById(pageName + '-page').style.display = 'block';
-            
-            // Update active menu
-            document.querySelectorAll('.nav-menu a').forEach(link => {
-                link.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Scroll to top
-            window.scrollTo(0, 0);
-            
-            // Load page specific data
-            if (pageName === 'members') {
-                loadMembers();
-            } else if (pageName === 'home') {
-                loadCommitteePreview();
-                updateStats();
-            }
-            
-            // Reinitialize AOS for new page
-            setTimeout(() => {
-                AOS.refresh();
-            }, 100);
-        }
-
-        // ==================== AUTHENTICATION ====================
-        auth.onAuthStateChanged((user) => {
-            currentUser = user;
-            const loginLink = document.getElementById('loginLink');
-            const addMemberLink = document.getElementById('addMemberLink');
-            
-            if (user) {
-                loginLink.textContent = 'Logout';
-                addMemberLink.style.display = 'block';
-                showAlert('Logged in as: ' + user.email);
-            } else {
-                loginLink.textContent = 'Login';
-                addMemberLink.style.display = 'none';
-            }
-        });
-
-        function handleEmailLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            auth.signInWithEmailAndPassword(email, password)
-                .then(() => {
-                    showAlert('Login successful!');
-                    showPage('home');
-                })
-                .catch((error) => {
-                    showAlert('Login failed: ' + error.message, 'error');
-                });
-        }
-
-        function handleGoogleLogin() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider)
-                .then(() => {
-                    showAlert('Login successful with Google!');
-                    showPage('home');
-                })
-                .catch((error) => {
-                    showAlert('Google login failed: ' + error.message, 'error');
-                });
-        }
-
-        function logout() {
-            auth.signOut()
-                .then(() => {
-                    showAlert('Logged out successfully');
-                    showPage('home');
-                })
-                .catch((error) => {
-                    showAlert('Error logging out: ' + error.message, 'error');
-                });
-        }
-
-        // ==================== MEMBER FUNCTIONS ====================
-        function loadMembers() {
-            const tableBody = document.getElementById('membersTableBody');
-            
-            membersCollection.orderBy('joinYear', 'desc').get()
-                .then((querySnapshot) => {
-                    allMembers = [];
-                    querySnapshot.forEach((doc) => {
-                        allMembers.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
-                    });
-                    displayMembers(allMembers);
-                    updateStats();
-                })
-                .catch((error) => {
-                    console.error('Error loading members:', error);
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="7" style="text-align: center; color: var(--danger);">
-                                Error loading members. Please try again.
-                            </td>
-                        </tr>
-                    `;
-                });
-        }
-
-        function displayMembers(members) {
-            const tableBody = document.getElementById('membersTableBody');
-            
-            if (members.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" style="text-align: center;">
-                            No members found.
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            tableBody.innerHTML = members.map(member => `
-                <tr>
-                    <td>${escapeHtml(member.name || '')}</td>
-                    <td><span class="position-badge position-${member.position?.toLowerCase().replace(' ', '-')}">${escapeHtml(member.position || '')}</span></td>
-                    <td>${escapeHtml(member.phone || '')}</td>
-                    <td>${escapeHtml(member.address || '')}</td>
-                    <td>${escapeHtml(member.joinYear || '')}</td>
-                    <td>${escapeHtml(member.bio || '').substring(0, 50)}${member.bio?.length > 50 ? '...' : ''}</td>
-                    <td>
-                        ${currentUser ? `
-                            <button onclick="editMember('${member.id}')" class="action-btn edit-btn">Edit</button>
-                            <button onclick="deleteMember('${member.id}')" class="action-btn delete-btn">Delete</button>
-                        ` : ''}
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function filterMembers() {
-            const searchTerm = document.getElementById('searchMember')?.value.toLowerCase() || '';
-            const position = document.getElementById('filterPosition')?.value || '';
-            
-            const filtered = allMembers.filter(member => {
-                const matchesSearch = !searchTerm || 
-                    member.name?.toLowerCase().includes(searchTerm) ||
-                    member.phone?.includes(searchTerm) ||
-                    member.address?.toLowerCase().includes(searchTerm);
-                
-                const matchesPosition = !position || member.position === position;
-                
-                return matchesSearch && matchesPosition;
-            });
-            
-            displayMembers(filtered);
-        }
-
-        function addMember(event) {
-            event.preventDefault();
-            
-            if (!currentUser) {
-                showAlert('You must be logged in to add members', 'error');
-                showPage('login');
-                return;
-            }
-            
-            const memberData = {
-                name: document.getElementById('name').value,
-                position: document.getElementById('position').value,
-                phone: document.getElementById('phone').value,
-                address: document.getElementById('address').value,
-                joinYear: document.getElementById('joinYear').value,
-                bio: document.getElementById('bio').value,
-                addedBy: currentUser.email,
-                addedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            
-            membersCollection.add(memberData)
-                .then(() => {
-                    showAlert('Member added successfully!');
-                    document.getElementById('addMemberForm').reset();
-                    showPage('members');
-                })
-                .catch((error) => {
-                    showAlert('Error adding member: ' + error.message, 'error');
-                });
-        }
-
-        function deleteMember(memberId) {
-            if (!currentUser) {
-                showAlert('You must be logged in to delete members', 'error');
-                return;
-            }
-            
-            if (confirm('Are you sure you want to delete this member?')) {
-                membersCollection.doc(memberId).delete()
-                    .then(() => {
-                        showAlert('Member deleted successfully');
-                        loadMembers();
-                    })
-                    .catch((error) => {
-                        showAlert('Error deleting member: ' + error.message, 'error');
-                    });
-            }
-        }
-
-        function editMember(memberId) {
-            if (!currentUser) {
-                showAlert('You must be logged in to edit members', 'error');
-                return;
-            }
-            
-            showPage('addMember');
-            document.getElementById('formTitle').textContent = 'Edit Member';
-            document.getElementById('submitBtn').textContent = 'Update Member';
-            
-            membersCollection.doc(memberId).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const member = doc.data();
-                        document.getElementById('name').value = member.name || '';
-                        document.getElementById('position').value = member.position || '';
-                        document.getElementById('phone').value = member.phone || '';
-                        document.getElementById('address').value = member.address || '';
-                        document.getElementById('joinYear').value = member.joinYear || '';
-                        document.getElementById('bio').value = member.bio || '';
-                        
-                        // Override form submission for update
-                        document.getElementById('addMemberForm').onsubmit = function(e) {
-                            e.preventDefault();
-                            updateMember(memberId);
-                        };
-                    }
-                })
-                .catch((error) => {
-                    showAlert('Error loading member data', 'error');
-                });
-        }
-
-        function updateMember(memberId) {
-            const memberData = {
-                name: document.getElementById('name').value,
-                position: document.getElementById('position').value,
-                phone: document.getElementById('phone').value,
-                address: document.getElementById('address').value,
-                joinYear: document.getElementById('joinYear').value,
-                bio: document.getElementById('bio').value,
-                updatedBy: currentUser.email,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            membersCollection.doc(memberId).update(memberData)
-                .then(() => {
-                    showAlert('Member updated successfully!');
-                    showPage('members');
-                })
-                .catch((error) => {
-                    showAlert('Error updating member: ' + error.message, 'error');
-                });
-        }
-
-        // ==================== CONTACT FUNCTIONS ====================
-        function handleContactSubmit(e) {
-            e.preventDefault();
-            
-            const formData = {
-                name: document.getElementById('contactName').value,
-                email: document.getElementById('contactEmail').value,
-                message: document.getElementById('contactMessage').value,
-                submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            
-            contactsCollection.add(formData)
-                .then(() => {
-                    showAlert('Message sent successfully! We\'ll get back to you soon.');
-                    document.getElementById('contactForm').reset();
-                })
-                .catch((error) => {
-                    showAlert('Error sending message. Please try again.', 'error');
-                });
-        }
-
-        // ==================== UTILITY FUNCTIONS ====================
-        function showAlert(message, type = 'success') {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert ${type}`;
-            alertDiv.textContent = message;
-            
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 5000);
-        }
-
-        function escapeHtml(unsafe) {
-            if (!unsafe) return '';
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        function updateStats() {
-            const stats = {
-                total: allMembers.length,
-                members: allMembers.filter(m => m.position === 'Member').length
-            };
-            
-            document.getElementById('totalMembers').textContent = stats.total;
-            document.getElementById('activeMembers').textContent = stats.members;
-            document.getElementById('committeeMembers').textContent = stats.total - stats.members;
-        }
-
-        function loadCommitteePreview() {
-            membersCollection.where('position', 'in', ['President', 'Vice President', 'Secretary'])
-                .limit(3)
-                .get()
-                .then((querySnapshot) => {
-                    const container = document.getElementById('committeePreview');
-                    if (container) {
-                        container.innerHTML = '';
-                        querySnapshot.forEach((doc, index) => {
-                            const member = doc.data();
-                            container.innerHTML += `
-                                <div class="card" data-aos="fade-up" data-aos-delay="${(index + 1) * 100}">
-                                    <div class="card-content">
-                                        <h3>${escapeHtml(member.name || '')}</h3>
-                                        <p class="position" style="color: var(--accent-color); font-weight: bold;">${escapeHtml(member.position || '')}</p>
-                                        <p>${escapeHtml(member.bio || '').substring(0, 100)}</p>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error loading committee preview:', error);
-                });
-        }
-
-        // ==================== LOGIN/REGISTER FUNCTIONS ====================
-        function showRegisterForm() {
-            document.querySelector('.form-container').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-        }
-
-        function showLoginForm() {
-            document.getElementById('registerForm').style.display = 'none';
-            document.querySelector('.form-container').style.display = 'block';
-        }
-
-        function handleRegister(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (password !== confirmPassword) {
-                showAlert('Passwords do not match', 'error');
-                return;
-            }
-
-            auth.createUserWithEmailAndPassword(email, password)
-                .then(() => {
-                    showAlert('Registration successful!');
-                    showPage('home');
-                })
-                .catch((error) => {
-                    showAlert('Registration failed: ' + error.message, 'error');
-                });
-        }
-
-        function showForgotPassword() {
-            const email = prompt('Please enter your email address:');
-            if (email) {
-                auth.sendPasswordResetEmail(email)
-                    .then(() => {
-                        showAlert('Password reset email sent! Check your inbox.');
-                    })
-                    .catch((error) => {
-                        showAlert('Error: ' + error.message, 'error');
-                    });
-            }
-        }
-
-        // ==================== INITIALIZATION ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize AOS
-            AOS.init({
-                duration: 1000,
-                once: true,
-                offset: 100
-            });
-
-            // Load Lottie Animations
-            lottie.loadAnimation({
-                container: document.getElementById('lottie-hero'),
-                renderer: 'svg',
-                loop: true,
-                autoplay: true,
-                path: 'https://assets10.lottiefiles.com/packages/lf20_p1qiuawe.json' // Sports animation
-            });
-
-            lottie.loadAnimation({
-                container: document.getElementById('lottie-history'),
-                renderer: 'svg',
-                loop: true,
-                autoplay: true,
-                path: 'https://assets2.lottiefiles.com/packages/lf20_p1qiuawe.json' // Celebration animation
-            });
-
-            // Mobile menu toggle
-            const hamburger = document.querySelector('.hamburger');
-            const navMenu = document.querySelector('.nav-menu');
-
-            hamburger.addEventListener('click', () => {
-                navMenu.classList.toggle('active');
-            });
-
-            // Set login link click handler
-            document.getElementById('loginLink').addEventListener('click', function(e) {
-                e.preventDefault();
-                if (currentUser) {
-                    logout();
-                } else {
-                    showPage('login');
-                }
-            });
-
-            // Load initial data
-            loadMembers();
-            
-            // Add filter listeners
-            document.getElementById('searchMember')?.addEventListener('input', filterMembers);
-            document.getElementById('filterPosition')?.addEventListener('change', filterMembers);
-        });
-    </script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+const firebaseConfig={apiKey:"AIzaSyD5QAGS-36neDTskPpEQjY835seWFCEq9o",authDomain:"youngsportingclub.firebaseapp.com",databaseURL:"https://youngsportingclub-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"youngsportingclub",storageBucket:"youngsportingclub.firebasestorage.app",messagingSenderId:"724732761340",appId:"1:724732761340:web:dc664c10d55d5bb87cb379",measurementId:"G-8VBTXPWVJE"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app);
+onAuthStateChanged(auth,user=>{
+  const btn=document.getElementById('nav-login-btn');if(!btn)return;
+  const lg=document.documentElement.getAttribute('data-lang')||'en';
+  if(user){
+    const i=(user.displayName||user.email)[0].toUpperCase();
+    btn.innerHTML=`<span style="display:inline-flex;align-items:center;gap:7px;background:rgba(254,44,85,.12);border:1px solid rgba(254,44,85,.3);padding:5px 12px 5px 5px;border-radius:50px;font-size:12px;font-weight:700"><span style="width:26px;height:26px;background:linear-gradient(135deg,#FE2C55,#25F4EE);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#010101;font-family:'Bebas Neue',sans-serif;font-size:15px">${i}</span>${lg==='bn'?'লগআউট':'Logout'}</span>`;
+    btn.onclick=async e=>{e.preventDefault();await signOut(auth);location.reload();};
+  }
+});
+AOS.init({duration:700,once:true,offset:55});
+window.addEventListener('load',()=>setTimeout(()=>document.getElementById('ldr').classList.add('hid'),500));
+window.addEventListener('scroll',()=>document.getElementById('hdr').classList.toggle('sc',window.scrollY>28));
+const hbg=document.getElementById('hbg'),mob=document.getElementById('mob');
+hbg.addEventListener('click',()=>{hbg.classList.toggle('op');mob.classList.toggle('op');});
+document.querySelectorAll('.mob a').forEach(a=>a.addEventListener('click',()=>{hbg.classList.remove('op');mob.classList.remove('op');}));
+function animC(){document.querySelectorAll('[data-target]').forEach(el=>{const t=parseInt(el.dataset.target),step=t/(1800/16);let c=0;const tm=setInterval(()=>{c=Math.min(c+step,t);el.textContent=Math.floor(c)+'+';if(c>=t)clearInterval(tm);},16);});}
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){animC();obs.disconnect();}});},{threshold:.3});
+const stb=document.querySelector('.stb');if(stb)obs.observe(stb);
+</script>
+<script>
+/* ════ BILINGUAL SYSTEM ════ */
+let CL = (function(){ try{return localStorage.getItem('ysc-lang')||'en';}catch(e){return 'en';} })();
+function setLang(lang){
+  CL=lang;
+  try{localStorage.setItem('ysc-lang',lang);}catch(e){}
+  document.documentElement.setAttribute('data-lang',lang);
+  document.documentElement.lang=lang==='bn'?'bn':'en';
+  document.querySelectorAll('[data-en]').forEach(el=>{
+    const v=el.getAttribute('data-'+lang);
+    if(v===null)return;
+    if(v.includes('<'))el.innerHTML=v; else el.textContent=v;
+  });
+  document.querySelectorAll('.lb').forEach(b=>{
+    b.classList.remove('on');
+    if((lang==='en'&&b.textContent.trim()==='EN')||(lang==='bn'&&b.textContent.trim()==='বাং'))b.classList.add('on');
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>setLang(CL));
+</script>
 </body>
 </html>
