@@ -64,7 +64,8 @@ ul{list-style:none}
 .phero h1{font-size:clamp(40px,6vw,70px);position:relative;z-index:1}
 .phero p{color:var(--gr);font-size:15px;max-width:480px;margin:12px auto 0;position:relative;z-index:1}
 .breadcrumb{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--gr);margin-top:16px;position:relative;z-index:1}
-.breadcrumb a{color:var(--cyan)}
+.breadcrumb a{color:var(--cyan);transition:var(--tr)}
+.breadcrumb a:hover{color:var(--pink)}
 
 /* CONTACT GRID */
 .cgrid{display:grid;grid-template-columns:1fr 1.5fr;gap:44px;align-items:flex-start}
@@ -99,11 +100,10 @@ ul{list-style:none}
 .finput{position:relative}
 .finput input,.fg textarea{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);color:var(--wh);padding:12px 16px 12px 44px;border-radius:var(--r);font-size:13.5px;font-family:'Poppins',sans-serif;transition:var(--tr);outline:none}
 [data-lang="bn"] .finput input,[data-lang="bn"] .fg textarea{font-family:'Hind Siliguri',sans-serif}
-.finput input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(254,44,85,.12)}
+.finput input:focus,.fg textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(254,44,85,.12)}
 .finput input::placeholder,.fg textarea::placeholder{color:rgba(136,136,136,.5)}
 .finput .fic{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--gr);font-size:15px}
 .fg textarea{padding:12px 16px;border:1px solid rgba(255,255,255,.1);resize:vertical;min-height:130px}
-.fg textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(254,44,85,.12)}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .msg{padding:12px 15px;border-radius:var(--r);font-size:13px;font-weight:500;margin-bottom:14px;display:none;align-items:center;gap:9px}
 .msg.show{display:flex;animation:fadein .3s}
@@ -161,7 +161,8 @@ footer{background:#050505;border-top:1px solid var(--bp);padding:58px 0 22px}
       <a href="index.html" data-en="Home" data-bn="হোম">Home</a>
       <a href="about.html" data-en="About" data-bn="সম্পর্কে">About</a>
       <a href="members.html" data-en="Members" data-bn="সদস্য">Members</a>
-      <a href="add-member.html" data-en="Add Member" data-bn="সদস্য যোগ">Add Member</a>
+      <!-- FIXED: add_member.html instead of add-member.html -->
+      <a href="add_member.html" data-en="Add Member" data-bn="সদস্য যোগ">Add Member</a>
       <a href="contact.html" class="on" data-en="Contact" data-bn="যোগাযোগ">Contact</a>
     </div>
     <div class="nr">
@@ -174,7 +175,8 @@ footer{background:#050505;border-top:1px solid var(--bp);padding:58px 0 22px}
     <a href="index.html" data-en="Home" data-bn="হোম">Home</a>
     <a href="about.html" data-en="About" data-bn="সম্পর্কে">About</a>
     <a href="members.html" data-en="Members" data-bn="সদস্য">Members</a>
-    <a href="add-member.html" data-en="Add Member" data-bn="সদস্য যোগ">Add Member</a>
+    <!-- FIXED: add_member.html instead of add-member.html -->
+    <a href="add_member.html" data-en="Add Member" data-bn="সদস্য যোগ">Add Member</a>
     <a href="contact.html" class="on" data-en="Contact" data-bn="যোগাযোগ">Contact</a>
     <a href="login.html" data-en="Login" data-bn="লগইন">Login</a>
     <div class="lang-sw" style="margin-top:10px"><button class="lb on" onclick="setLang('en')">EN</button><button class="lb" onclick="setLang('bn')">বাং</button></div>
@@ -325,18 +327,71 @@ footer{background:#050505;border-top:1px solid var(--bp);padding:58px 0 22px}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-const FC={apiKey:"AIzaSyD5QAGS-36neDTskPpEQjY835seWFCEq9o",authDomain:"youngsportingclub.firebaseapp.com",databaseURL:"https://youngsportingclub-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"youngsportingclub",storageBucket:"youngsportingclub.firebasestorage.app",messagingSenderId:"724732761340",appId:"1:724732761340:web:dc664c10d55d5bb87cb379"};
-const app=initializeApp(FC),auth=getAuth(app);
-onAuthStateChanged(auth,user=>{
-  const btn=document.getElementById('nav-login-btn'),lg=document.documentElement.getAttribute('data-lang')||'en';
-  if(user){const i=(user.displayName||user.email)[0].toUpperCase();if(btn){btn.innerHTML=`<span style="display:inline-flex;align-items:center;gap:7px;background:rgba(254,44,85,.12);border:1px solid rgba(254,44,85,.3);padding:5px 12px 5px 5px;border-radius:50px;font-size:12px;font-weight:700"><span style="width:26px;height:26px;background:linear-gradient(135deg,#FE2C55,#25F4EE);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#010101;font-family:'Bebas Neue',sans-serif;font-size:15px">${i}</span>${lg==='bn'?'লগআউট':'Logout'}</span>`;btn.onclick=async e=>{e.preventDefault();await signOut(auth);location.reload();};}}
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD5QAGS-36neDTskPpEQjY835seWFCEq9o",
+  authDomain: "youngsportingclub.firebaseapp.com",
+  databaseURL: "https://youngsportingclub-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "youngsportingclub",
+  storageBucket: "youngsportingclub.firebasestorage.app",
+  messagingSenderId: "724732761340",
+  appId: "1:724732761340:web:dc664c10d55d5bb87cb379"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Authentication state
+onAuthStateChanged(auth, (user) => {
+  const btn = document.getElementById('nav-login-btn');
+  if (!btn) return;
+  
+  const lang = document.documentElement.getAttribute('data-lang') || 'en';
+  
+  if (user) {
+    const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
+    btn.innerHTML = `<span style="display:inline-flex;align-items:center;gap:7px;background:rgba(254,44,85,.12);border:1px solid rgba(254,44,85,.3);padding:5px 12px 5px 5px;border-radius:50px;font-size:12px;font-weight:700"><span style="width:26px;height:26px;background:linear-gradient(135deg,#FE2C55,#25F4EE);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#010101;font-family:'Bebas Neue',sans-serif;font-size:15px">${initial}</span>${lang === 'bn' ? 'লগআউট' : 'Logout'}</span>`;
+    btn.onclick = async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.reload();
+    };
+  } else {
+    btn.innerHTML = lang === 'bn' ? 'লগইন' : 'Login';
+    btn.href = 'login.html';
+    btn.onclick = null;
+  }
 });
-AOS.init({duration:700,once:true,offset:55});
-window.addEventListener('load',()=>setTimeout(()=>document.getElementById('ldr').classList.add('hid'),500));
-window.addEventListener('scroll',()=>document.getElementById('hdr').classList.toggle('sc',window.scrollY>28));
-const hbgEl=document.getElementById('hbg'),mobEl=document.getElementById('mob');
-hbgEl.addEventListener('click',()=>{hbgEl.classList.toggle('op');mobEl.classList.toggle('op');});
+
+// Initialize AOS
+AOS.init({ duration: 700, once: true, offset: 55 });
+
+// Hide loader
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('ldr').classList.add('hid'), 500);
+});
+
+// Header scroll effect
+window.addEventListener('scroll', () => {
+  const header = document.getElementById('hdr');
+  if (window.scrollY > 28) {
+    header.classList.add('sc');
+  } else {
+    header.classList.remove('sc');
+  }
+});
+
+// Mobile menu toggle
+const hbgBtn = document.getElementById('hbg');
+const mobileMenu = document.getElementById('mob');
+if (hbgBtn && mobileMenu) {
+  hbgBtn.addEventListener('click', () => {
+    hbgBtn.classList.toggle('op');
+    mobileMenu.classList.toggle('op');
+  });
+}
 </script>
+
 <script>
 /* ════ EMAILJS CONFIG ════
    Replace these with your actual EmailJS credentials
@@ -347,65 +402,161 @@ const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
 const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
 
 /* ════ BILINGUAL SYSTEM ════ */
-let CL=(function(){try{return localStorage.getItem('ysc-lang')||'en';}catch(e){return 'en';}})();
-function setLang(lang){
-  CL=lang;try{localStorage.setItem('ysc-lang',lang);}catch(e){}
-  document.documentElement.setAttribute('data-lang',lang);
-  document.documentElement.lang=lang==='bn'?'bn':'en';
-  document.querySelectorAll('[data-en]').forEach(el=>{
-    const v=el.getAttribute('data-'+lang);
-    if(v===null)return;
-    if(v.includes('<'))el.innerHTML=v;else el.textContent=v;
+let currentLang = (function() {
+  try {
+    return localStorage.getItem('ysc-lang') || 'en';
+  } catch(e) {
+    return 'en';
+  }
+})();
+
+function setLang(lang) {
+  currentLang = lang;
+  try {
+    localStorage.setItem('ysc-lang', lang);
+  } catch(e) {}
+  
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.lang = lang === 'bn' ? 'bn' : 'en';
+  
+  // Update all elements with data attributes
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const value = el.getAttribute('data-' + lang);
+    if (value === null) return;
+    if (value.includes('<')) {
+      el.innerHTML = value;
+    } else {
+      el.textContent = value;
+    }
   });
-  document.querySelectorAll('.lb').forEach(b=>{
-    b.classList.remove('on');
-    if((lang==='en'&&b.textContent.trim()==='EN')||(lang==='bn'&&b.textContent.trim()==='বাং'))b.classList.add('on');
+  
+  // Update language buttons
+  document.querySelectorAll('.lb').forEach(btn => {
+    btn.classList.remove('on');
+    if ((lang === 'en' && btn.textContent.trim() === 'EN') || 
+        (lang === 'bn' && btn.textContent.trim() === 'বাং')) {
+      btn.classList.add('on');
+    }
   });
-  // Placeholders
-  const ph=[
-    ['cname',{en:'Full name',bn:'পুরো নাম'}],
-    ['cphone',{en:'+880 1XXX-XXXXXX',bn:'+৮৮০ ১XXX-XXXXXX'}],
-    ['cemail',{en:'your@email.com',bn:'আপনার@ইমেইল.কম'}],
-    ['csubject',{en:'What is this about?',bn:'এটি কি বিষয়ে?'}],
-    ['cmsg',{en:'Write your message here…',bn:'এখানে আপনার বার্তা লিখুন…'}],
+  
+  // Update placeholders
+  const placeholderMap = [
+    ['cname', { en: 'Full name', bn: 'পুরো নাম' }],
+    ['cphone', { en: '+880 1XXX-XXXXXX', bn: '+৮৮০ ১XXX-XXXXXX' }],
+    ['cemail', { en: 'your@email.com', bn: 'আপনার@ইমেইল.কম' }],
+    ['csubject', { en: 'What is this about?', bn: 'এটি কি বিষয়ে?' }],
+    ['cmsg', { en: 'Write your message here…', bn: 'এখানে আপনার বার্তা লিখুন…' }]
   ];
-  ph.forEach(([id,p])=>{const el=document.getElementById(id);if(el)el.placeholder=p[lang]||p.en;});
+  
+  placeholderMap.forEach(([id, texts]) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.placeholder = texts[lang] || texts.en;
+    }
+  });
 }
-document.addEventListener('DOMContentLoaded',()=>setLang(CL));
+
+document.addEventListener('DOMContentLoaded', () => {
+  setLang(currentLang);
+  
+  // Initialize EmailJS
+  if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+  }
+});
 
 /* ════ CONTACT FORM SUBMIT ════ */
-const cform=document.getElementById('cform');
-const okMsg=document.getElementById('cok-msg'),errMsg=document.getElementById('cerr-msg'),subBtn=document.getElementById('csubBtn');
-function showMsg(el,txt,type){el.textContent=txt;el.className='msg msg-'+type+' show';}
-function hideMsg(el){el.className='msg';el.textContent='';}
+const contactForm = document.getElementById('cform');
+const okMsg = document.getElementById('cok-msg');
+const errMsg = document.getElementById('cerr-msg');
+const submitBtn = document.getElementById('csubBtn');
 
-if(typeof emailjs!=='undefined') emailjs.init(EMAILJS_PUBLIC_KEY);
-
-cform.addEventListener('submit',async function(e){
-  e.preventDefault();
-  const lg=CL;
-  const name=document.getElementById('cname').value.trim();
-  const email=document.getElementById('cemail').value.trim();
-  const subject=document.getElementById('csubject').value.trim();
-  const msg=document.getElementById('cmsg').value.trim();
-  hideMsg(okMsg);hideMsg(errMsg);
-  if(!name||!email||!subject||!msg){showMsg(errMsg,lg==='bn'?'⚠ প্রয়োজনীয় সকল তথ্য পূরণ করুন।':'⚠ Please fill in all required fields.','err');return;}
-  subBtn.disabled=true;subBtn.innerHTML=`<i class="fas fa-spinner fa-spin"></i> <span>${lg==='bn'?'পাঠানো হচ্ছে…':'Sending…'}</span>`;
-  if(EMAILJS_PUBLIC_KEY==='YOUR_EMAILJS_PUBLIC_KEY'){
-    // Fallback — open mailto
-    const mailtoLink=`mailto:support.youngsportingclub@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Name: '+name+'\nEmail: '+email+'\n\n'+msg)}`;
-    window.location.href=mailtoLink;
-    showMsg(okMsg,lg==='bn'?'✓ আপনার ইমেইল অ্যাপ খুলে গেছে। বার্তাটি পাঠান।':'✓ Your email app has opened. Please send the message.','ok');
-    cform.reset();
-  }else{
-    try{
-      await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,{from_name:name,from_email:email,subject:subject,message:msg,phone:document.getElementById('cphone').value.trim()});
-      showMsg(okMsg,lg==='bn'?'✓ বার্তা সফলভাবে পাঠানো হয়েছে! আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।':'✓ Message sent successfully! We\'ll get back to you soon.','ok');
-      cform.reset();
-    }catch(err){showMsg(errMsg,lg==='bn'?'⚠ বার্তা পাঠাতে ব্যর্থ হয়েছে। পরে আবার চেষ্টা করুন।':'⚠ Failed to send message. Please try again later.','err');}
+function showMessage(element, text, type) {
+  if (element) {
+    element.textContent = text;
+    element.className = 'msg msg-' + type + ' show';
   }
-  subBtn.disabled=false;subBtn.innerHTML=`<i class="fas fa-paper-plane"></i> <span data-en="Send Message" data-bn="বার্তা পাঠান">${lg==='bn'?'বার্তা পাঠান':'Send Message'}</span>`;
-});
+}
+
+function hideMessage(element) {
+  if (element) {
+    element.className = 'msg';
+    element.textContent = '';
+  }
+}
+
+if (contactForm) {
+  contactForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const lang = currentLang;
+    
+    // Get form values
+    const name = document.getElementById('cname')?.value.trim() || '';
+    const email = document.getElementById('cemail')?.value.trim() || '';
+    const subject = document.getElementById('csubject')?.value.trim() || '';
+    const message = document.getElementById('cmsg')?.value.trim() || '';
+    const phone = document.getElementById('cphone')?.value.trim() || '';
+    
+    // Hide previous messages
+    hideMessage(okMsg);
+    hideMessage(errMsg);
+    
+    // Validate required fields
+    if (!name || !email || !subject || !message) {
+      showMessage(errMsg, lang === 'bn' ? '⚠ প্রয়োজনীয় সকল তথ্য পূরণ করুন।' : '⚠ Please fill in all required fields.', 'err');
+      return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showMessage(errMsg, lang === 'bn' ? '⚠ বৈধ ইমেইল ঠিকানা দিন।' : '⚠ Please enter a valid email address.', 'err');
+      return;
+    }
+    
+    // Disable button and show loading
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>${lang === 'bn' ? 'পাঠানো হচ্ছে…' : 'Sending…'}</span>`;
+    
+    // Check if EmailJS is configured
+    if (EMAILJS_PUBLIC_KEY === 'YOUR_EMAILJS_PUBLIC_KEY' || 
+        EMAILJS_SERVICE_ID === 'YOUR_SERVICE_ID' || 
+        EMAILJS_TEMPLATE_ID === 'YOUR_TEMPLATE_ID') {
+      
+      // Fallback to mailto
+      const mailtoLink = `mailto:support.youngsportingclub@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\nPhone: ' + phone + '\n\n' + message)}`;
+      window.location.href = mailtoLink;
+      
+      showMessage(okMsg, lang === 'bn' ? '✓ আপনার ইমেইল অ্যাপ খুলে গেছে। বার্তাটি পাঠান।' : '✓ Your email app has opened. Please send the message.', 'ok');
+      contactForm.reset();
+      
+    } else {
+      // Send via EmailJS
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          from_name: name,
+          from_email: email,
+          subject: subject,
+          message: message,
+          phone: phone,
+          to_email: 'support.youngsportingclub@gmail.com'
+        });
+        
+        showMessage(okMsg, lang === 'bn' ? '✓ বার্তা সফলভাবে পাঠানো হয়েছে! আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।' : '✓ Message sent successfully! We\'ll get back to you soon.', 'ok');
+        contactForm.reset();
+        
+      } catch (error) {
+        console.error('EmailJS error:', error);
+        showMessage(errMsg, lang === 'bn' ? '⚠ বার্তা পাঠাতে ব্যর্থ হয়েছে। পরে আবার চেষ্টা করুন।' : '⚠ Failed to send message. Please try again later.', 'err');
+      }
+    }
+    
+    // Re-enable button
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> <span>${lang === 'bn' ? 'বার্তা পাঠান' : 'Send Message'}</span>`;
+  });
+}
 </script>
 </body>
 </html>
