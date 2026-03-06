@@ -100,7 +100,7 @@ a{text-decoration:none;color:inherit}
 
 /* FORGOT */
 .forgot{text-align:right;margin-bottom:14px}
-.forgot a{font-size:12px;color:var(--cyan);transition:var(--tr)}
+.forgot a{font-size:12px;color:var(--cyan);transition:var(--tr);cursor:pointer}
 .forgot a:hover{color:var(--pink)}
 
 /* DIVIDER */
@@ -109,7 +109,7 @@ a{text-decoration:none;color:inherit}
 
 /* FOOTER NOTE */
 .lnote{text-align:center;font-size:12px;color:var(--gr);margin-top:18px;padding:0 4px}
-.lnote a{color:var(--pink)}
+.lnote a{color:var(--pink);cursor:pointer}
 
 /* LOADER */
 .ldr{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s,visibility .5s;flex-direction:column;gap:16px}
@@ -217,80 +217,244 @@ a{text-decoration:none;color:inherit}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-const FC={apiKey:"AIzaSyD5QAGS-36neDTskPpEQjY835seWFCEq9o",authDomain:"youngsportingclub.firebaseapp.com",databaseURL:"https://youngsportingclub-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"youngsportingclub",storageBucket:"youngsportingclub.firebasestorage.app",messagingSenderId:"724732761340",appId:"1:724732761340:web:dc664c10d55d5bb87cb379"};
-const app=initializeApp(FC),auth=getAuth(app),provider=new GoogleAuthProvider();
 
-window.addEventListener('load',()=>setTimeout(()=>document.getElementById('ldr').classList.add('hid'),500));
+const firebaseConfig = {
+  apiKey: "AIzaSyD5QAGS-36neDTskPpEQjY835seWFCEq9o",
+  authDomain: "youngsportingclub.firebaseapp.com",
+  databaseURL: "https://youngsportingclub-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "youngsportingclub",
+  storageBucket: "youngsportingclub.firebasestorage.app",
+  messagingSenderId: "724732761340",
+  appId: "1:724732761340:web:dc664c10d55d5bb87cb379"
+};
 
-onAuthStateChanged(auth,user=>{if(user)setTimeout(()=>location.href='index.html',500);});
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-function lg(){return document.documentElement.getAttribute('data-lang')||'en';}
-function showMsg(id,txt,type){const el=document.getElementById(id);el.textContent=txt;el.className='msg msg-'+type+' show';}
-function hideMsg(id){const el=document.getElementById(id);el.className='msg';el.textContent='';}
-function errMsg(code,lang){
-  const map={'auth/user-not-found':{en:'No account found with this email.',bn:'এই ইমেইলে কোনো অ্যাকাউন্ট নেই।'},'auth/wrong-password':{en:'Wrong password. Please try again.',bn:'ভুল পাসওয়ার্ড। আবার চেষ্টা করুন।'},'auth/email-already-in-use':{en:'This email is already registered.',bn:'এই ইমেইলটি ইতিমধ্যে নিবন্ধিত।'},'auth/weak-password':{en:'Password must be at least 6 characters.',bn:'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে।'},'auth/invalid-email':{en:'Invalid email address.',bn:'অবৈধ ইমেইল ঠিকানা।'},'auth/too-many-requests':{en:'Too many attempts. Try later.',bn:'অনেক বার চেষ্টা করা হয়েছে। পরে চেষ্টা করুন।'},'auth/popup-closed-by-user':{en:'Sign-in popup was closed.',bn:'সাইন-ইন পপআপ বন্ধ হয়ে গেছে।'}};
-  const m=map[code];return m?(lang==='bn'?m.bn:m.en):(lang==='bn'?'⚠ কিছু সমস্যা হয়েছে।':'⚠ Something went wrong.');
+// Loader hide
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('ldr').classList.add('hid'), 500);
+});
+
+// Redirect if already logged in
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    setTimeout(() => window.location.href = 'index.html', 500);
+  }
+});
+
+// Language helper
+function getLang() {
+  return document.documentElement.getAttribute('data-lang') || 'en';
 }
-window.switchTab=function(t){
-  document.getElementById('panelLogin').className='lpanel'+(t==='login'?' on':'');
-  document.getElementById('panelReg').className='lpanel'+(t==='register'?' on':'');
-  document.getElementById('tabLogin').className='ltab'+(t==='login'?' on':'');
-  document.getElementById('tabReg').className='ltab'+(t==='register'?' on':'');
+
+// Show message
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.textContent = text;
+    el.className = 'msg msg-' + type + ' show';
+  }
+}
+
+// Hide message
+function hideMsg(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.className = 'msg';
+    el.textContent = '';
+  }
+}
+
+// Error message mapping
+function getErrorMessage(code, lang) {
+  const messages = {
+    'auth/user-not-found': { en: 'No account found with this email.', bn: 'এই ইমেইলে কোনো অ্যাকাউন্ট নেই।' },
+    'auth/wrong-password': { en: 'Wrong password. Please try again.', bn: 'ভুল পাসওয়ার্ড। আবার চেষ্টা করুন।' },
+    'auth/email-already-in-use': { en: 'This email is already registered.', bn: 'এই ইমেইলটি ইতিমধ্যে নিবন্ধিত।' },
+    'auth/weak-password': { en: 'Password must be at least 6 characters.', bn: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে।' },
+    'auth/invalid-email': { en: 'Invalid email address.', bn: 'অবৈধ ইমেইল ঠিকানা।' },
+    'auth/too-many-requests': { en: 'Too many attempts. Try later.', bn: 'অনেক বার চেষ্টা করা হয়েছে। পরে চেষ্টা করুন।' },
+    'auth/popup-closed-by-user': { en: 'Sign-in popup was closed.', bn: 'সাইন-ইন পপআপ বন্ধ হয়ে গেছে।' }
+  };
+  const msg = messages[code];
+  return msg ? (lang === 'bn' ? msg.bn : msg.en) : (lang === 'bn' ? '⚠ কিছু সমস্যা হয়েছে।' : '⚠ Something went wrong.');
+}
+
+// Tab switching
+window.switchTab = function(tab) {
+  document.getElementById('panelLogin').className = 'lpanel' + (tab === 'login' ? ' on' : '');
+  document.getElementById('panelReg').className = 'lpanel' + (tab === 'register' ? ' on' : '');
+  document.getElementById('tabLogin').className = 'ltab' + (tab === 'login' ? ' on' : '');
+  document.getElementById('tabReg').className = 'ltab' + (tab === 'register' ? ' on' : '');
 };
-window.togglePw=function(id,icon){const el=document.getElementById(id);if(el.type==='password'){el.type='text';icon.classList.replace('fa-eye','fa-eye-slash');}else{el.type='password';icon.classList.replace('fa-eye-slash','fa-eye');}};
-window.doLogin=async function(){
-  const email=document.getElementById('lemail').value.trim(),pass=document.getElementById('lpass').value;
-  if(!email||!pass){showMsg('lerr-msg',lg()==='bn'?'⚠ সকল তথ্য পূরণ করুন।':'⚠ Please fill in all fields.','err');return;}
-  hideMsg('lerr-msg');const btn=document.getElementById('loginBtn');btn.disabled=true;btn.textContent=lg()==='bn'?'সাইন ইন হচ্ছে…':'Signing in…';
-  try{await signInWithEmailAndPassword(auth,email,pass);showMsg('lok-msg',lg()==='bn'?'✓ সফলভাবে সাইন ইন হয়েছে! ড্যাশবোর্ডে যাচ্ছে…':'✓ Signed in! Redirecting…','ok');}
-  catch(e){showMsg('lerr-msg',errMsg(e.code,lg()),'err');}
-  btn.disabled=false;btn.innerHTML=`<span data-en="Sign In" data-bn="সাইন ইন">${lg()==='bn'?'সাইন ইন':'Sign In'}</span>`;
+
+// Toggle password visibility
+window.togglePw = function(id, icon) {
+  const el = document.getElementById(id);
+  if (el) {
+    if (el.type === 'password') {
+      el.type = 'text';
+      icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+      el.type = 'password';
+      icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+  }
 };
-window.doRegister=async function(){
-  const name=document.getElementById('rname').value.trim(),email=document.getElementById('remail').value.trim(),pass=document.getElementById('rpass').value;
-  if(!name||!email||!pass){showMsg('rerr-msg',lg()==='bn'?'⚠ সকল তথ্য পূরণ করুন।':'⚠ Please fill in all fields.','err');return;}
-  hideMsg('rerr-msg');const btn=document.getElementById('regBtn');btn.disabled=true;btn.textContent=lg()==='bn'?'তৈরি হচ্ছে…':'Creating…';
-  try{const cred=await createUserWithEmailAndPassword(auth,email,pass);await updateProfile(cred.user,{displayName:name});showMsg('rok-msg',lg()==='bn'?'✓ অ্যাকাউন্ট তৈরি হয়েছে! ড্যাশবোর্ডে যাচ্ছে…':'✓ Account created! Redirecting…','ok');}
-  catch(e){showMsg('rerr-msg',errMsg(e.code,lg()),'err');}
-  btn.disabled=false;btn.innerHTML=`<span>${lg()==='bn'?'অ্যাকাউন্ট তৈরি করুন':'Create Account'}</span>`;
+
+// Login function
+window.doLogin = async function() {
+  const email = document.getElementById('lemail').value.trim();
+  const pass = document.getElementById('lpass').value;
+  const lang = getLang();
+  
+  if (!email || !pass) {
+    showMsg('lerr-msg', lang === 'bn' ? '⚠ সকল তথ্য পূরণ করুন।' : '⚠ Please fill in all fields.', 'err');
+    return;
+  }
+  
+  hideMsg('lerr-msg');
+  
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.innerHTML = lang === 'bn' ? 'সাইন ইন হচ্ছে…' : 'Signing in…';
+  
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    showMsg('lok-msg', lang === 'bn' ? '✓ সফলভাবে সাইন ইন হয়েছে! ড্যাশবোর্ডে যাচ্ছে…' : '✓ Signed in! Redirecting…', 'ok');
+  } catch (error) {
+    showMsg('lerr-msg', getErrorMessage(error.code, lang), 'err');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<span>${lang === 'bn' ? 'সাইন ইন' : 'Sign In'}</span>`;
+  }
 };
-window.doGoogle=async function(){
-  try{await signInWithPopup(auth,provider);}
-  catch(e){if(e.code!=='auth/popup-closed-by-user'){showMsg('lerr-msg',errMsg(e.code,lg()),'err');}}
+
+// Register function
+window.doRegister = async function() {
+  const name = document.getElementById('rname').value.trim();
+  const email = document.getElementById('remail').value.trim();
+  const pass = document.getElementById('rpass').value;
+  const lang = getLang();
+  
+  if (!name || !email || !pass) {
+    showMsg('rerr-msg', lang === 'bn' ? '⚠ সকল তথ্য পূরণ করুন।' : '⚠ Please fill in all fields.', 'err');
+    return;
+  }
+  
+  hideMsg('rerr-msg');
+  
+  const btn = document.getElementById('regBtn');
+  btn.disabled = true;
+  btn.innerHTML = lang === 'bn' ? 'তৈরি হচ্ছে…' : 'Creating…';
+  
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(userCredential.user, { displayName: name });
+    showMsg('rok-msg', lang === 'bn' ? '✓ অ্যাকাউন্ট তৈরি হয়েছে! ড্যাশবোর্ডে যাচ্ছে…' : '✓ Account created! Redirecting…', 'ok');
+  } catch (error) {
+    showMsg('rerr-msg', getErrorMessage(error.code, lang), 'err');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<span>${lang === 'bn' ? 'অ্যাকাউন্ট তৈরি করুন' : 'Create Account'}</span>`;
+  }
 };
-window.forgotPw=async function(e){
-  e.preventDefault();const email=document.getElementById('lemail').value.trim();
-  if(!email){showMsg('lerr-msg',lg()==='bn'?'⚠ প্রথমে ইমেইল লিখুন।':'⚠ Enter your email address first.','err');return;}
-  try{await sendPasswordResetEmail(auth,email);showMsg('lok-msg',lg()==='bn'?'✓ পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে।':'✓ Password reset link sent. Check your email.','ok');}
-  catch(e){showMsg('lerr-msg',errMsg(e.code,lg()),'err');}
+
+// Google login
+window.doGoogle = async function() {
+  const lang = getLang();
+  try {
+    await signInWithPopup(auth, provider);
+  } catch (error) {
+    if (error.code !== 'auth/popup-closed-by-user') {
+      showMsg('lerr-msg', getErrorMessage(error.code, lang), 'err');
+    }
+  }
+};
+
+// Forgot password
+window.forgotPw = async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('lemail').value.trim();
+  const lang = getLang();
+  
+  if (!email) {
+    showMsg('lerr-msg', lang === 'bn' ? '⚠ প্রথমে ইমেইল লিখুন।' : '⚠ Enter your email address first.', 'err');
+    return;
+  }
+  
+  try {
+    await sendPasswordResetEmail(auth, email);
+    showMsg('lok-msg', lang === 'bn' ? '✓ পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে।' : '✓ Password reset link sent. Check your email.', 'ok');
+  } catch (error) {
+    showMsg('lerr-msg', getErrorMessage(error.code, lang), 'err');
+  }
 };
 </script>
+
 <script>
-let CL=(function(){try{return localStorage.getItem('ysc-lang')||'en';}catch(e){return 'en';}})();
-function setLang(lang){
-  CL=lang;try{localStorage.setItem('ysc-lang',lang);}catch(e){}
-  document.documentElement.setAttribute('data-lang',lang);
-  document.documentElement.lang=lang==='bn'?'bn':'en';
-  document.querySelectorAll('[data-en]').forEach(el=>{
-    const v=el.getAttribute('data-'+lang);
-    if(v===null)return;
-    if(v.includes('<'))el.innerHTML=v;else el.textContent=v;
+// Language switcher
+let currentLang = (function() {
+  try {
+    return localStorage.getItem('ysc-lang') || 'en';
+  } catch(e) {
+    return 'en';
+  }
+})();
+
+function setLang(lang) {
+  currentLang = lang;
+  try {
+    localStorage.setItem('ysc-lang', lang);
+  } catch(e) {}
+  
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.lang = lang === 'bn' ? 'bn' : 'en';
+  
+  // Update all elements with data attributes
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const value = el.getAttribute('data-' + lang);
+    if (value !== null) {
+      if (value.includes('<')) {
+        el.innerHTML = value;
+      } else {
+        el.textContent = value;
+      }
+    }
   });
-  document.querySelectorAll('.lb').forEach(b=>{
-    b.classList.remove('on');
-    if((lang==='en'&&b.textContent.trim()==='EN')||(lang==='bn'&&b.textContent.trim()==='বাং'))b.classList.add('on');
+  
+  // Update language buttons
+  document.querySelectorAll('.lb').forEach(btn => {
+    btn.classList.remove('on');
+    if ((lang === 'en' && btn.textContent.trim() === 'EN') || 
+        (lang === 'bn' && btn.textContent.trim() === 'বাং')) {
+      btn.classList.add('on');
+    }
   });
+  
   // Update placeholders
-  const phMap=[
-    ['lemail',{en:'your@email.com',bn:'আপনার@ইমেইল.কম'}],
-    ['lpass',{en:'Enter your password',bn:'পাসওয়ার্ড লিখুন'}],
-    ['rname',{en:'Your full name',bn:'আপনার পুরো নাম'}],
-    ['remail',{en:'your@email.com',bn:'আপনার@ইমেইল.কম'}],
-    ['rpass',{en:'Min 6 characters',bn:'সর্বনিম্ন ৬ অক্ষর'}],
+  const placeholderMap = [
+    ['lemail', { en: 'your@email.com', bn: 'আপনার@ইমেইল.কম' }],
+    ['lpass', { en: 'Enter your password', bn: 'পাসওয়ার্ড লিখুন' }],
+    ['rname', { en: 'Your full name', bn: 'আপনার পুরো নাম' }],
+    ['remail', { en: 'your@email.com', bn: 'আপনার@ইমেইল.কম' }],
+    ['rpass', { en: 'Min 6 characters', bn: 'সর্বনিম্ন ৬ অক্ষর' }]
   ];
-  phMap.forEach(([id,p])=>{const el=document.getElementById(id);if(el)el.placeholder=p[lang]||p.en;});
+  
+  placeholderMap.forEach(([id, texts]) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.placeholder = texts[lang] || texts.en;
+    }
+  });
 }
-document.addEventListener('DOMContentLoaded',()=>setLang(CL));
+
+// Initialize language on page load
+document.addEventListener('DOMContentLoaded', () => {
+  setLang(currentLang);
+});
 </script>
 </body>
 </html>
