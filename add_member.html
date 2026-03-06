@@ -726,7 +726,7 @@
                 <a href="index.html" data-en="Home" data-bn="হোম">Home</a>
                 <a href="about.html" data-en="About" data-bn="সম্পর্কে">About</a>
                 <a href="members.html" data-en="Members" data-bn="সদস্য">Members</a>
-                <!-- ফিক্স করা হয়েছে: add_member.html -->
+                <!-- ফিক্স: add_member.html (আন্ডারস্কোর) -->
                 <a href="add_member.html" class="on" data-en="Add Member" data-bn="সদস্য যোগ">Add Member</a>
                 <a href="contact.html" data-en="Contact" data-bn="যোগাযোগ">Contact</a>
             </div>
@@ -750,7 +750,7 @@
             <a href="index.html" data-en="Home" data-bn="হোম">Home</a>
             <a href="about.html" data-en="About" data-bn="সম্পর্কে">About</a>
             <a href="members.html" data-en="Members" data-bn="সদস্য">Members</a>
-            <!-- ফিক্স করা হয়েছে: add_member.html -->
+            <!-- ফিক্স: add_member.html (আন্ডারস্কোর) -->
             <a href="add_member.html" class="on" data-en="Add Member" data-bn="সদস্য যোগ">Add Member</a>
             <a href="contact.html" data-en="Contact" data-bn="যোগাযোগ">Contact</a>
             <a href="login.html" data-en="Login" data-bn="লগইন">Login</a>
@@ -792,7 +792,7 @@
                 <div>
                     <strong data-en="Login Required" data-bn="লগইন প্রয়োজন">Login Required</strong><br>
                     <span style="font-size:12px;color:var(--gr)" data-en="You must be logged in to add members." data-bn="সদস্য যোগ করতে আপনাকে লগইন করতে হবে।">You must be logged in to add members.</span>
-                    <!-- ফিক্স করা হয়েছে: login.html -->
+                    <!-- ফিক্স: login.html -->
                     <a href="login.html" style="color:var(--pink);font-size:12px;font-weight:600;display:inline-block;margin-left:6px" data-en="Login here →" data-bn="এখানে লগইন করুন →">Login here →</a>
                 </div>
             </div>
@@ -807,7 +807,7 @@
                         </h2>
                         <p style="font-size:13px;color:var(--gr)" data-en="Fill in the form to register a new club member." data-bn="নতুন ক্লাব সদস্য নিবন্ধন করতে ফর্মটি পূরণ করুন।">Fill in the form to register a new club member.</p>
                     </div>
-                    <!-- ফিক্স করা হয়েছে: members.html -->
+                    <!-- ফিক্স: members.html -->
                     <a href="members.html" class="btn btn-ol" style="font-size:12px;padding:9px 18px">
                         <i class="fas fa-arrow-left"></i> 
                         <span data-en="View All" data-bn="সব দেখুন">View All</span>
@@ -929,6 +929,7 @@
         const okMsg = document.getElementById('okMsg');
         const errMsg = document.getElementById('errMsg');
         const subBtn = document.getElementById('subBtn');
+        const resetBtn = document.getElementById('resetBtn');
 
         // ==================== AUTHENTICATION STATE ====================
         onAuthStateChanged(auth, (user) => {
@@ -944,4 +945,215 @@
                     const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
                     navLoginBtn.innerHTML = `
                         <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(254,44,85,.12);border:1px solid rgba(254,44,85,.3);padding:5px 12px 5px 5px;border-radius:50px;font-size:12px;font-weight:700">
-                            <span style="width:26px;height:26px;background:linear-gradient(135deg,#FE2C55,#25F4EE);border-radius:
+                            <span style="width:26px;height:26px;background:linear-gradient(135deg,#FE2C55,#25F4EE);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#010101;font-family:'Bebas Neue',sans-serif;font-size:15px">${initial}</span>
+                            ${lang === 'bn' ? 'লগআউট' : 'Logout'}
+                        </span>
+                    `;
+                    
+                    navLoginBtn.onclick = async (e) => {
+                        e.preventDefault();
+                        try {
+                            await signOut(auth);
+                            window.location.reload();
+                        } catch (error) {
+                            console.error('Logout error:', error);
+                        }
+                    };
+                }
+            } else {
+                // User is not logged in
+                authNotice.style.display = 'flex';
+                formCard.style.display = 'none';
+                
+                // Reset login button
+                if (navLoginBtn) {
+                    navLoginBtn.innerHTML = lang === 'bn' ? 'লগইন' : 'Login';
+                    navLoginBtn.href = 'login.html';
+                    navLoginBtn.onclick = null;
+                }
+            }
+        });
+
+        // ==================== FORM HANDLING ====================
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                document.getElementById('addForm').reset();
+                okMsg.classList.remove('show');
+                errMsg.classList.remove('show');
+            });
+        }
+
+        document.getElementById('addForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Hide previous messages
+            okMsg.classList.remove('show');
+            errMsg.classList.remove('show');
+            
+            const lang = document.documentElement.getAttribute('data-lang') || 'en';
+            
+            // Get form data
+            const memberData = {
+                name: document.getElementById('fname').value.trim(),
+                position: document.getElementById('fpos').value,
+                phone: document.getElementById('fphone').value.trim(),
+                joinYear: document.getElementById('fyear').value,
+                address: document.getElementById('faddr').value.trim(),
+                bio: document.getElementById('fbio').value.trim()
+            };
+            
+            // Validate required fields
+            if (!memberData.name || !memberData.position || !memberData.phone || !memberData.joinYear || !memberData.address) {
+                errMsg.textContent = lang === 'bn' ? '⚠ সকল প্রয়োজনীয় ক্ষেত্র পূরণ করুন।' : '⚠ Please fill in all required fields.';
+                errMsg.classList.add('show');
+                return;
+            }
+            
+            // Validate phone number (basic validation)
+            if (memberData.phone.length < 10) {
+                errMsg.textContent = lang === 'bn' ? '⚠ বৈধ ফোন নম্বর দিন।' : '⚠ Please enter a valid phone number.';
+                errMsg.classList.add('show');
+                return;
+            }
+            
+            // Validate join year
+            const year = parseInt(memberData.joinYear);
+            if (year < 2009 || year > 2099) {
+                errMsg.textContent = lang === 'bn' ? '⚠ বৈধ বছর দিন (২০০৯-২০৯৯)।' : '⚠ Please enter a valid year (2009-2099).';
+                errMsg.classList.add('show');
+                return;
+            }
+            
+            // Disable submit button and show loading
+            subBtn.disabled = true;
+            subBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${lang === 'bn' ? 'যোগ হচ্ছে…' : 'Adding…'}`;
+            
+            try {
+                // Add to Firestore
+                await addDoc(collection(db, 'members'), {
+                    ...memberData,
+                    addedAt: serverTimestamp()
+                });
+                
+                // Show success message
+                okMsg.innerHTML = `<i class="fas fa-check-circle"></i> ${lang === 'bn' ? 
+                    'সদস্য সফলভাবে যোগ হয়েছে! <a href="members.html">সকল সদস্য দেখুন →</a>' : 
+                    'Member added successfully! <a href="members.html">View all members →</a>'}`;
+                okMsg.classList.add('show');
+                
+                // Reset form
+                document.getElementById('addForm').reset();
+                
+            } catch (error) {
+                console.error('Error adding member:', error);
+                errMsg.textContent = lang === 'bn' ? 
+                    '⚠ ত্রুটি: ' + error.message : 
+                    '⚠ Error: ' + error.message;
+                errMsg.classList.add('show');
+            }
+            
+            // Re-enable submit button
+            subBtn.disabled = false;
+            subBtn.innerHTML = `<i class="fas fa-user-plus"></i> ${lang === 'bn' ? 'সদস্য যোগ করুন' : 'Add Member'}`;
+        });
+
+        // ==================== INITIALIZATION ====================
+        // Initialize AOS
+        AOS.init({
+            duration: 700,
+            once: true,
+            offset: 55
+        });
+
+        // Hide loader after page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('ldr').classList.add('hid');
+            }, 500);
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('hdr');
+            if (window.scrollY > 28) {
+                header.classList.add('sc');
+            } else {
+                header.classList.remove('sc');
+            }
+        });
+
+        // Mobile menu toggle
+        const hbgBtn = document.getElementById('hbg');
+        const mobileMenu = document.getElementById('mob');
+        
+        if (hbgBtn && mobileMenu) {
+            hbgBtn.addEventListener('click', () => {
+                hbgBtn.classList.toggle('op');
+                mobileMenu.classList.toggle('op');
+            });
+        }
+    </script>
+
+    <!-- Language Switcher Script (non-module) -->
+    <script>
+        // Language management
+        let currentLang = (function() {
+            try {
+                return localStorage.getItem('ysc-lang') || 'en';
+            } catch(e) {
+                return 'en';
+            }
+        })();
+
+        function setLang(lang) {
+            currentLang = lang;
+            
+            try {
+                localStorage.setItem('ysc-lang', lang);
+            } catch(e) {}
+            
+            // Update HTML attributes
+            document.documentElement.setAttribute('data-lang', lang);
+            document.documentElement.lang = lang === 'bn' ? 'bn' : 'en';
+            
+            // Update all elements with data attributes
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const value = el.getAttribute('data-' + lang);
+                if (value !== null) {
+                    if (value.includes('<')) {
+                        el.innerHTML = value;
+                    } else {
+                        el.textContent = value;
+                    }
+                }
+            });
+            
+            // Update language buttons
+            document.querySelectorAll('.lb').forEach(btn => {
+                btn.classList.remove('on');
+                if ((lang === 'en' && btn.textContent.trim() === 'EN') || 
+                    (lang === 'bn' && btn.textContent.trim() === 'বাং')) {
+                    btn.classList.add('on');
+                }
+            });
+            
+            // Update form placeholders
+            const placeholders = [
+                ['fname', lang === 'bn' ? 'যেমন: রহিম হোসেন' : 'e.g. Rahim Hossain'],
+                ['faddr', lang === 'bn' ? 'যেমন: শিংড়াউলী, শমশেরনগর' : 'e.g. Shingrahully, Shamsher Nagar'],
+                ['fbio', lang === 'bn' ? 'এই সদস্য সম্পর্কে সংক্ষিপ্ত বিবরণ…' : 'Brief description about this member…']
+            ];
+            
+            placeholders.forEach(([id, text]) => {
+                const el = document.getElementById(id);
+                if (el) el.placeholder = text;
+            });
+        }
+
+        // Initialize language on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setLang(currentLang);
+        });
+    </script>
+</body>
+</html>
