@@ -243,78 +243,214 @@ footer{background:#050505;border-top:1px solid var(--bp);padding:58px 0 22px}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-const FC={apiKey:"AIzaSyD5QAGS-36neDTskPpEQjY835seWFCEq9o",authDomain:"youngsportingclub.firebaseapp.com",databaseURL:"https://youngsportingclub-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"youngsportingclub",storageBucket:"youngsportingclub.firebasestorage.app",messagingSenderId:"724732761340",appId:"1:724732761340:web:dc664c10d55d5bb87cb379"};
-const app=initializeApp(FC),auth=getAuth(app),db=getFirestore(app);
 
-onAuthStateChanged(auth,user=>{
-  const btn=document.getElementById('nav-login-btn');if(!btn)return;
-  if(user){const i=(user.displayName||user.email)[0].toUpperCase();const lg=document.documentElement.getAttribute('data-lang')||'en';btn.innerHTML=`<span style="display:inline-flex;align-items:center;gap:7px;background:rgba(254,44,85,.12);border:1px solid rgba(254,44,85,.3);padding:5px 12px 5px 5px;border-radius:50px;font-size:12px;font-weight:700"><span style="width:26px;height:26px;background:linear-gradient(135deg,#FE2C55,#25F4EE);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#010101;font-family:'Bebas Neue',sans-serif;font-size:15px">${i}</span>${lg==='bn'?'লগআউট':'Logout'}</span>`;btn.onclick=async e=>{e.preventDefault();await signOut(auth);location.reload();};}
+const firebaseConfig = {
+  apiKey: "AIzaSyD5QAGS-36neDTskPpEQjY835seWFCEq9o",
+  authDomain: "youngsportingclub.firebaseapp.com",
+  databaseURL: "https://youngsportingclub-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "youngsportingclub",
+  storageBucket: "youngsportingclub.firebasestorage.app",
+  messagingSenderId: "724732761340",
+  appId: "1:724732761340:web:dc664c10d55d5bb87cb379"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Authentication state
+onAuthStateChanged(auth, (user) => {
+  const btn = document.getElementById('nav-login-btn');
+  if (!btn) return;
+  
+  if (user) {
+    const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
+    const lang = document.documentElement.getAttribute('data-lang') || 'en';
+    btn.innerHTML = `<span style="display:inline-flex;align-items:center;gap:7px;background:rgba(254,44,85,.12);border:1px solid rgba(254,44,85,.3);padding:5px 12px 5px 5px;border-radius:50px;font-size:12px;font-weight:700"><span style="width:26px;height:26px;background:linear-gradient(135deg,#FE2C55,#25F4EE);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#010101;font-family:'Bebas Neue',sans-serif;font-size:15px">${initial}</span>${lang === 'bn' ? 'লগআউট' : 'Logout'}</span>`;
+    btn.onclick = async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.reload();
+    };
+  } else {
+    btn.innerHTML = document.documentElement.getAttribute('data-lang') === 'bn' ? 'লগইন' : 'Login';
+    btn.href = 'login.html';
+    btn.onclick = null;
+  }
 });
-AOS.init({duration:700,once:true,offset:55});
-window.addEventListener('load',()=>setTimeout(()=>document.getElementById('ldr').classList.add('hid'),500));
-window.addEventListener('scroll',()=>document.getElementById('hdr').classList.toggle('sc',window.scrollY>28));
-const hbgEl=document.getElementById('hbg'),mobEl=document.getElementById('mob');
-hbgEl.addEventListener('click',()=>{hbgEl.classList.toggle('op');mobEl.classList.toggle('op');});
 
-let allMembers=[];
-const tbody=document.getElementById('mBody'),searchEl=document.getElementById('searchInput'),filterEl=document.getElementById('posFilter'),cntEl=document.getElementById('mCount');
+// Initialize AOS
+AOS.init({ duration: 700, once: true, offset: 55 });
 
-const posClass={'President':'p-president','Vice President':'p-vice','General Secretary':'p-secretary','Assistant Secretary':'p-asst','Treasurer':'p-treasurer','Sports Secretary':'p-sports','Member':'p-member'};
+// Hide loader
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('ldr').classList.add('hid'), 500);
+});
 
-function initials(n){return n.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+// Header scroll effect
+window.addEventListener('scroll', () => {
+  document.getElementById('hdr').classList.toggle('sc', window.scrollY > 28);
+});
 
-function render(members){
-  const lg=document.documentElement.getAttribute('data-lang')||'en';
-  if(!members.length){
-    tbody.innerHTML=`<tr><td colspan="5"><div class="nodata"><div class="nic">👥</div><p>${lg==='bn'?'কোনো সদস্য পাওয়া যায়নি।':'No members found.'}</p></div></td></tr>`;
+// Mobile menu toggle
+const hbgBtn = document.getElementById('hbg');
+const mobileMenu = document.getElementById('mob');
+if (hbgBtn && mobileMenu) {
+  hbgBtn.addEventListener('click', () => {
+    hbgBtn.classList.toggle('op');
+    mobileMenu.classList.toggle('op');
+  });
+}
+
+// Members data handling
+let allMembers = [];
+const tbody = document.getElementById('mBody');
+const searchEl = document.getElementById('searchInput');
+const filterEl = document.getElementById('posFilter');
+const countEl = document.getElementById('mCount');
+
+const positionClass = {
+  'President': 'p-president',
+  'Vice President': 'p-vice',
+  'General Secretary': 'p-secretary',
+  'Assistant Secretary': 'p-asst',
+  'Treasurer': 'p-treasurer',
+  'Sports Secretary': 'p-sports',
+  'Member': 'p-member'
+};
+
+function getInitials(name) {
+  if (!name) return '?';
+  return name.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase();
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text).replace(/[&<>"]/g, function(match) {
+    if (match === '&') return '&amp;';
+    if (match === '<') return '&lt;';
+    if (match === '>') return '&gt;';
+    if (match === '"') return '&quot;';
+    return match;
+  });
+}
+
+function renderMembers(members) {
+  const lang = document.documentElement.getAttribute('data-lang') || 'en';
+  
+  if (!members || members.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="nodata"><div class="nic">👥</div><p>${lang === 'bn' ? 'কোনো সদস্য পাওয়া যায়নি।' : 'No members found.'}</p></div></td></tr>`;
+    countEl.textContent = lang === 'bn' ? 'দেখাচ্ছে 0 জন সদস্য' : 'Showing 0 members';
     return;
   }
-  tbody.innerHTML=members.map(m=>{
-    const pc=posClass[m.position]||'p-member';
-    const posLbl=m.position;
+  
+  tbody.innerHTML = members.map(member => {
+    const posClass = positionClass[member.position] || 'p-member';
+    const positionLabel = member.position || 'Member';
+    const bioText = member.bio ? escapeHtml(member.bio.substring(0, 36)) + (member.bio.length > 36 ? '…' : '') : '';
+    
     return `<tr>
-      <td><div class="mname"><div class="mav glowing">${initials(m.name)}</div><div><div class="nm">${esc(m.name)}</div><div class="bio">${m.bio?esc(m.bio.substring(0,36))+(m.bio.length>36?'…':''):''}</div></div></div></td>
-      <td><span class="pbdg ${pc}">${esc(posLbl)}</span></td>
-      <td>${esc(m.phone)}</td>
-      <td>${esc(m.address)}</td>
-      <td>${esc(m.joinYear)}</td>
-    </tr>`;}).join('');
-  const lg2=document.documentElement.getAttribute('data-lang')||'en';
-  cntEl.textContent=lg2==='bn'?`দেখাচ্ছে ${members.length} জন সদস্য`:`Showing ${members.length} members`;
+      <td><div class="mname"><div class="mav glowing">${getInitials(member.name)}</div><div><div class="nm">${escapeHtml(member.name)}</div><div class="bio">${bioText}</div></div></div></td>
+      <td><span class="pbdg ${posClass}">${escapeHtml(positionLabel)}</span></td>
+      <td>${escapeHtml(member.phone)}</td>
+      <td>${escapeHtml(member.address)}</td>
+      <td>${escapeHtml(member.joinYear)}</td>
+    </tr>`;
+  }).join('');
+  
+  countEl.textContent = lang === 'bn' ? `দেখাচ্ছে ${members.length} জন সদস্য` : `Showing ${members.length} members`;
 }
 
-function applyFilters(){
-  const s=searchEl.value.trim().toLowerCase(),pos=filterEl.value;
-  const f=allMembers.filter(m=>{
-    const ms=!s||m.name.toLowerCase().includes(s)||String(m.phone).includes(s)||m.address.toLowerCase().includes(s);
-    const mp=!pos||pos==='all'||m.position===pos;
-    return ms&&mp;
+function filterMembers() {
+  const searchTerm = searchEl.value.trim().toLowerCase();
+  const position = filterEl.value;
+  
+  const filtered = allMembers.filter(member => {
+    const matchesSearch = !searchTerm || 
+      (member.name && member.name.toLowerCase().includes(searchTerm)) ||
+      (member.phone && String(member.phone).includes(searchTerm)) ||
+      (member.address && member.address.toLowerCase().includes(searchTerm));
+    
+    const matchesPosition = !position || position === 'all' || member.position === position;
+    
+    return matchesSearch && matchesPosition;
   });
-  render(f);
+  
+  renderMembers(filtered);
 }
 
-const q=query(collection(db,'members'),orderBy('addedAt','desc'));
-onSnapshot(q,snap=>{
-  allMembers=snap.docs.map(d=>({id:d.id,...d.data()}));
-  applyFilters();
-},err=>{
-  console.error(err);
-  tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:40px;color:#FE2C55">⚠ Failed to load members. Check Firebase config.</td></tr>`;
+// Listen for real-time updates
+const membersQuery = query(collection(db, 'members'), orderBy('addedAt', 'desc'));
+onSnapshot(membersQuery, (snapshot) => {
+  allMembers = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+  filterMembers();
+}, (error) => {
+  console.error('Firestore error:', error);
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:#FE2C55">⚠ Failed to load members. Check Firebase config.</td></tr>`;
 });
-searchEl.addEventListener('input',applyFilters);
-filterEl.addEventListener('change',applyFilters);
 
-window.updateMembersLang=function(lang){
-  searchEl.placeholder=lang==='bn'?'নাম, ফোন বা ঠিকানা দিয়ে খুঁজুন…':'Search by name, phone or address…';
-  const lg2=lang==='bn'?'en':'en';
-  applyFilters();
-};
+// Add event listeners
+if (searchEl) searchEl.addEventListener('input', filterMembers);
+if (filterEl) filterEl.addEventListener('change', filterMembers);
 </script>
+
 <script>
-let CL=(function(){try{return localStorage.getItem('ysc-lang')||'en';}catch(e){return 'en';}})();
-function setLang(lang){CL=lang;try{localStorage.setItem('ysc-lang',lang);}catch(e){}document.documentElement.setAttribute('data-lang',lang);document.documentElement.lang=lang==='bn'?'bn':'en';document.querySelectorAll('[data-en]').forEach(el=>{const v=el.getAttribute('data-'+lang);if(v===null)return;if(v.includes('<'))el.innerHTML=v;else el.textContent=v;});document.querySelectorAll('.lb').forEach(b=>{b.classList.remove('on');if((lang==='en'&&b.textContent.trim()==='EN')||(lang==='bn'&&b.textContent.trim()==='বাং'))b.classList.add('on');});const si=document.getElementById('searchInput');if(si)si.placeholder=lang==='bn'?'নাম, ফোন বা ঠিকানা দিয়ে খুঁজুন…':'Search by name, phone or address…';}
-document.addEventListener('DOMContentLoaded',()=>setLang(CL));
+// Language switcher
+let currentLang = (function() {
+  try {
+    return localStorage.getItem('ysc-lang') || 'en';
+  } catch(e) {
+    return 'en';
+  }
+})();
+
+function setLang(lang) {
+  currentLang = lang;
+  try {
+    localStorage.setItem('ysc-lang', lang);
+  } catch(e) {}
+  
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.lang = lang === 'bn' ? 'bn' : 'en';
+  
+  // Update all elements with data attributes
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const value = el.getAttribute('data-' + lang);
+    if (value === null) return;
+    if (value.includes('<')) {
+      el.innerHTML = value;
+    } else {
+      el.textContent = value;
+    }
+  });
+  
+  // Update language buttons
+  document.querySelectorAll('.lb').forEach(btn => {
+    btn.classList.remove('on');
+    if ((lang === 'en' && btn.textContent.trim() === 'EN') || 
+        (lang === 'bn' && btn.textContent.trim() === 'বাং')) {
+      btn.classList.add('on');
+    }
+  });
+  
+  // Update search placeholder
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.placeholder = lang === 'bn' ? 'নাম, ফোন বা ঠিকানা দিয়ে খুঁজুন…' : 'Search by name, phone or address…';
+  }
+  
+  // Re-filter to update count text
+  if (window.filterMembers) {
+    setTimeout(window.filterMembers, 100);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setLang(currentLang);
+});
 </script>
 </body>
 </html>
